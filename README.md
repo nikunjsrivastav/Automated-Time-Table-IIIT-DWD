@@ -7,7 +7,7 @@ This project automates the generation of class and exam timetables for IIIT Dhar
 - Automated Class & Exam Scheduling
 - Conflict Detection & Auto-Resolution
 - Room Allocation
-- Export (CSV, PDF, iCal)
+- Export (CSV, PDF)
 ## Team Members (Software Sages)
 - Nikunj Srivastav (24BCS087)
 - Sudhanshu Baberwal (24BCS147)
