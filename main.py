@@ -237,5 +237,3 @@ courses_second_half = [c for c in courses if str(c.get("Semester_Half")).strip()
 
 generate_timetable(courses_first_half, "timetable_first_half.xlsx")
 generate_timetable(courses_second_half, "timetable_second_half.xlsx")
-
-
