@@ -4,7 +4,7 @@ import random
 from openpyxl import load_workbook
 from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
 
-with open("time_slots.json") as f:
+with open("data/time_slots.json") as f:
     slots = json.load(f)["time_slots"]
 
 slot_keys = [f"{slot['start'].strip()}-{slot['end'].strip()}" for slot in slots]
@@ -17,8 +17,8 @@ def slot_duration(slot):
 
 slot_durations = {s: slot_duration(s) for s in slot_keys}
 
-courses = pd.read_csv("courses.csv").to_dict(orient="records")
-rooms_df = pd.read_csv("rooms.csv")  # must have columns: Room_ID, Type
+courses = pd.read_csv("data/courses.csv").to_dict(orient="records")
+rooms_df = pd.read_csv("data/rooms.csv")  # must have columns: Room_ID, Type
 classrooms = rooms_df[rooms_df["Type"].str.lower() == "classroom"]["Room_ID"].tolist()
 labs = rooms_df[rooms_df["Type"].str.lower() == "lab"]["Room_ID"].tolist()
 
@@ -237,3 +237,4 @@ courses_second_half = [c for c in courses if str(c.get("Semester_Half")).strip()
 
 generate_timetable(courses_first_half, "timetable_first_half.xlsx")
 generate_timetable(courses_second_half, "timetable_second_half.xlsx")
+
