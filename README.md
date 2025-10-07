@@ -98,7 +98,7 @@ This manual provides instructions for downloading, setting up, and using the sys
 
 - Run the script to generate timetables:
   ```
-  python TT_gen.py
+  python main.py
   ```
 - The script will generate:
   - `timetable_all_departments.xlsx` - The main timetable file with all department schedules
