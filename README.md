@@ -174,7 +174,7 @@ Since the system is a command-line application, usage involves running the scrip
 
 - Open a terminal, navigate to the project directory, and run:
   ```
-  python TT_gen.py
+  python main.py
   ```
 - The script will:
   - Read course and room data.
