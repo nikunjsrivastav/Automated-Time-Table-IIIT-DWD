@@ -2,8 +2,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 import pandas as pd
 
-# Import your functions here
-# from facultyTT import parse_time, slot_duration_from_bounds, parse_ltp, safe_str, get_free_blocks, allocate_session, merge_and_style_cells, generate_timetable, split_by_half
+from main_timetable.py import parse_time, slot_duration_from_bounds, parse_ltp, safe_str, get_free_blocks, allocate_session, merge_and_style_cells, generate_timetable, split_by_half
 
 # Example functions extracted for testing
 def parse_time(t):
@@ -91,3 +90,4 @@ class TestTimetableFunctions(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
