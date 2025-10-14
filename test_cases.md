@@ -150,6 +150,26 @@ Each table follows the format:
 | Timestamped filenames | Full Program | Verify filename pattern | Files saved as `<timestamp>_timetable_*.xlsx` |
 
 ---
+### **Faculty Timetable Generator (main_facultytt.py)**
+
+| Test Case Input | Function | Description | Expected Output |
+|-----------------|----------|-------------|-----------------|
+| Valid `time_slots.json` and one or more `courses*.csv` files containing `Faculty` column | `load_time_slots()` / `build_slot_keys()` | Load and normalize time slots from JSON and build `slot_keys` list | `slot_keys` list created (e.g. `["09:00-10:00", ...]`) |
+| Missing or malformed `time_slots.json` | `load_time_slots()` | JSON file dependency and parsing error handling | Raises `FileNotFoundError` or `JSONDecodeError` |
+| Directory contains no `courses*.csv` files or CSVs missing `Faculty` column | `discover_course_csvs()` / `load_and_concat_courses()` | Discover course CSVs, read them, and concat into single DataFrame | Raises `ValueError: No valid course CSVs found with 'Faculty' column.` |
+| Mixed branch CSVs with `BranchFile` assignment | `load_and_concat_courses()` | Ensures branch filename is preserved when loading per-branch CSVs | Combined DataFrame with `BranchFile` column |
+| DataFrame with `Faculty` values present | `group_by_faculty()` | Group courses by faculty for per-faculty schedule generation | `faculty_groups` produced (iterable of (faculty, df) pairs) |
+| Sheet title contains invalid Excel characters like `/:*?[]` | `sanitize_sheet_name()` | Replace invalid characters and trim to safe length for Excel | Returns sanitized sheet name (underscores, ≤30 chars) |
+| Worksheet with variable cell content lengths | `auto_adjust_column_widths()` | Compute and set column widths to fit contents within limit | Columns auto-sized (max width limit applied) |
+| Faculty group iteration and sheet creation | `create_faculty_sheets()` | For each faculty, create a sheet and write header row ("Day" + slot keys) | One worksheet per faculty with correct header row |
+| Random placement of courses into timetable slots | `assign_random_slots()` | Prototype logic that assigns each course to a random day+slot | Timetable dict filled with course labels (no exceptions) |
+| Same course assigned multiple times in a sheet | `assign_random_slots()` | Ensure repeated course occurrences are allowed and handled | Course appears in multiple (random) cells without error |
+| Color mapping for course codes and cell styling | `apply_cell_styling()` | Assign consistent color per course; apply borders, alignment, bold font, wrapping | Cells filled and styled; same course shares same fill color |
+| Exhausted color pool (more unique courses than preset colors) | `apply_cell_styling()` | Fallback color generation for extra courses | Generates RGB hex colors and applies them consistently |
+| Large number of courses for a single faculty (10+) | Full per-faculty generation | Tests scalability of sheet creation, assignment, and styling | Sheet created successfully; all courses assigned; no crash |
+| Workbook save step | `save_workbook()` | Persist the final `Workbook` to disk with a stable filename | `facultyTT.xlsx` created on disk |
+| Reproducible results when seed set | `random.seed(...)` + overall flow | Deterministic behavior when seed is set before assignment | Same `facultyTT.xlsx` content across runs with same seed |
+
 
 ### ✅ **Expected Deliverables**
 - `timetable_first_halfCSE.xlsx`  
@@ -158,6 +178,7 @@ Each table follows the format:
 - `timetable_second_halfECE.xlsx`  
 - `timetable_first_halfDSAI.xlsx`  
 - `timetable_second_halfDSAI.xlsx`
+- `facultyTT.xlsx`
 
 ---
 
