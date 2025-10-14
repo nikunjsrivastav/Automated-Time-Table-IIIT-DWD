@@ -24,7 +24,7 @@ thin_border = Border(left=Side(style='thin'),
                      top=Side(style='thin'),
                      bottom=Side(style='thin'))
 
-with open("time_slots.json") as f:
+with open("data/time_slots.json") as f:
     slots_raw = json.load(f)["time_slots"]
 
 def parse_time(t):
@@ -46,11 +46,11 @@ slots_norm.sort(key=lambda x: parse_time(x["start"]))
 slot_keys = [s["key"] for s in slots_norm]
 slot_durations = {s["key"]: s["duration"] for s in slots_norm}
 
-courses = pd.read_csv("coursesCSE-III.csv").to_dict(orient="records")
-coursesECE = pd.read_csv("coursesECE-III.csv").to_dict(orient="records")
-coursesDSAI = pd.read_csv("coursesDSAI-III.csv").to_dict(orient="records")
+courses = pd.read_csv("data/coursesCSE-III.csv").to_dict(orient="records")
+coursesECE = pd.read_csv("data/coursesECE-III.csv").to_dict(orient="records")
+coursesDSAI = pd.read_csv("data/coursesDSAI-III.csv").to_dict(orient="records")
 
-rooms_df = pd.read_csv("rooms.csv")
+rooms_df = pd.read_csv("data/rooms.csv")
 rooms_df["Type"] = rooms_df["Type"].astype(str)
 classrooms = rooms_df[rooms_df["Type"].str.lower() == "classroom"]["Room_ID"].tolist()
 labs = rooms_df[rooms_df["Type"].str.lower() == "lab"]["Room_ID"].tolist()
@@ -376,3 +376,4 @@ generate_timetable(c2_first, "timetable_first_halfECE.xlsx")
 generate_timetable(c2_second, "timetable_second_halfECE.xlsx")
 generate_timetable(c3_first, "timetable_first_halfDSAI.xlsx")
 generate_timetable(c3_second, "timetable_second_halfDSAI.xlsx")
+
