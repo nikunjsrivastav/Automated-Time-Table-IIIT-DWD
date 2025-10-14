@@ -6,7 +6,6 @@ from openpyxl import load_workbook
 from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
 from openpyxl.utils import get_column_letter
 
-# ---------------- Config ----------------
 RANDOM_SEED = 123
 random.seed(RANDOM_SEED)
 
@@ -25,7 +24,6 @@ thin_border = Border(left=Side(style='thin'),
                      top=Side(style='thin'),
                      bottom=Side(style='thin'))
 
-# ---------------- Load Time Slots ----------------
 with open("time_slots.json") as f:
     slots_raw = json.load(f)["time_slots"]
 
@@ -48,7 +46,6 @@ slots_norm.sort(key=lambda x: parse_time(x["start"]))
 slot_keys = [s["key"] for s in slots_norm]
 slot_durations = {s["key"]: s["duration"] for s in slots_norm}
 
-# ---------------- Load Courses and Rooms ----------------
 courses = pd.read_csv("coursesCSE-III.csv").to_dict(orient="records")
 coursesECE = pd.read_csv("coursesECE-III.csv").to_dict(orient="records")
 coursesDSAI = pd.read_csv("coursesDSAI-III.csv").to_dict(orient="records")
@@ -58,7 +55,6 @@ rooms_df["Type"] = rooms_df["Type"].astype(str)
 classrooms = rooms_df[rooms_df["Type"].str.lower() == "classroom"]["Room_ID"].tolist()
 labs = rooms_df[rooms_df["Type"].str.lower() == "lab"]["Room_ID"].tolist()
 
-# ---------------- Utility Functions ----------------
 def safe_str(val):
     if val is None:
         return ""
@@ -75,7 +71,6 @@ def parse_ltp(sc_string):
     except:
         return [0, 0, 0, 0, 0]
 
-# ---------------- Timetable Helper Functions ----------------
 def get_free_blocks(timetable, day):
     free_blocks = []
     block = []
@@ -154,7 +149,6 @@ def allocate_session(timetable, lecturer_busy, course_room_map, day, faculty, co
             return True
     return False
 
-# ---------------- Excel Styling ----------------
 def merge_and_style_cells(filename):
     wb = load_workbook(filename)
     ws = wb.active
@@ -231,7 +225,6 @@ def merge_and_style_cells(filename):
 
             col = merge_cols[-1] + 1
 
-    # Auto column width for timetable
     for col in ws.columns:
         max_length = 0
         col_letter = col[0].column_letter
@@ -242,7 +235,6 @@ def merge_and_style_cells(filename):
 
     wb.save(filename)
 
-# ---------------- Timetable Generator ----------------
 def generate_timetable(courses_to_allocate, filename):
     timetable = pd.DataFrame("", index=days, columns=slot_keys)
     lecturer_busy = {day: {} for day in days}
@@ -268,7 +260,6 @@ def generate_timetable(courses_to_allocate, filename):
         is_elective = (code == "Elective")
         L, T, P, S, C = parse_ltp(course.get("L-T-P-S-C", "0-0-0-0-0"))
 
-        # Allocate lectures
         lecture_hours_remaining = L
         attempts = 0
         while lecture_hours_remaining > 1e-9 and attempts < MAX_ATTEMPTS:
@@ -289,7 +280,6 @@ def generate_timetable(courses_to_allocate, filename):
                         allocated = True
                         break
 
-        # Allocate tutorials
         tutorial_hours_remaining = T
         attempts = 0
         while tutorial_hours_remaining > 1e-9 and attempts < MAX_ATTEMPTS:
@@ -299,7 +289,6 @@ def generate_timetable(courses_to_allocate, filename):
                     tutorial_hours_remaining -= 1.0
                     break
 
-        # Allocate practicals
         practical_hours_remaining = P
         attempts = 0
         while practical_hours_remaining > 1e-9 and attempts < MAX_ATTEMPTS:
@@ -327,11 +316,10 @@ def generate_timetable(courses_to_allocate, filename):
     timetable.to_excel(outname, index=True)
     merge_and_style_cells(outname)
 
-    # ---------------- Append Course Info ----------------
     wb = load_workbook(outname)
     ws = wb.active
 
-    start_row = ws.max_row + 3  # leave 2 blank rows
+    start_row = ws.max_row + 3 
 
     friendly_headers = {
         "Course_Code": "Course Code",
@@ -362,7 +350,6 @@ def generate_timetable(courses_to_allocate, filename):
             cell.alignment = Alignment(horizontal="center", vertical="center")
             col_idx += 1
 
-    # Auto column width for course info
     for col_idx in range(1, len(headers) + 1):
         max_length = 0
         for row in ws.iter_rows(min_row=start_row, max_row=ws.max_row, min_col=col_idx, max_col=col_idx):
@@ -374,7 +361,6 @@ def generate_timetable(courses_to_allocate, filename):
     wb.save(outname)
     print(f"Saved styled timetable with course info in {outname}")
 
-# ---------------- Split Courses ----------------
 def split_by_half(courses_list):
     first = [c for c in courses_list if safe_str(c.get("Semester_Half", "")) in ["1", "0"]]
     second = [c for c in courses_list if safe_str(c.get("Semester_Half", "")) in ["2", "0"]]
@@ -384,7 +370,6 @@ c1_first, c1_second = split_by_half(courses)
 c2_first, c2_second = split_by_half(coursesECE)
 c3_first, c3_second = split_by_half(coursesDSAI)
 
-# ---------------- Generate Timetables ----------------
 generate_timetable(c1_first, "timetable_first_halfCSE.xlsx")
 generate_timetable(c1_second, "timetable_second_halfCSE.xlsx")
 generate_timetable(c2_first, "timetable_first_halfECE.xlsx")
