@@ -1,4 +1,4 @@
-# 🧪 Test Cases — Automated Timetable Generator
+# 🧪 Test Cases — Automated-Time-Table-IIIT-DWD
 
 This document lists all test cases for verifying each function in the timetable generation system.  
 Each table follows the format:
