@@ -6,6 +6,7 @@ from openpyxl import load_workbook
 from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
 from openpyxl.utils import get_column_letter
 
+# ================== CONFIG ==================
 RANDOM_SEED = 123
 random.seed(RANDOM_SEED)
 
@@ -24,6 +25,7 @@ thin_border = Border(left=Side(style='thin'),
                      top=Side(style='thin'),
                      bottom=Side(style='thin'))
 
+# ================== LOAD DATA ==================
 with open("data/time_slots.json") as f:
     slots_raw = json.load(f)["time_slots"]
 
@@ -46,7 +48,8 @@ slots_norm.sort(key=lambda x: parse_time(x["start"]))
 slot_keys = [s["key"] for s in slots_norm]
 slot_durations = {s["key"]: s["duration"] for s in slots_norm}
 
-courses = pd.read_csv("data/coursesCSE-III.csv").to_dict(orient="records")
+coursesA = pd.read_csv("data/coursesCSEA-III.csv").to_dict(orient="records")
+coursesB = pd.read_csv("data/coursesCSEB-III.csv").to_dict(orient="records")
 coursesECE = pd.read_csv("data/coursesECE-III.csv").to_dict(orient="records")
 coursesDSAI = pd.read_csv("data/coursesDSAI-III.csv").to_dict(orient="records")
 
@@ -55,6 +58,7 @@ rooms_df["Type"] = rooms_df["Type"].astype(str)
 classrooms = rooms_df[rooms_df["Type"].str.lower() == "classroom"]["Room_ID"].tolist()
 labs = rooms_df[rooms_df["Type"].str.lower() == "lab"]["Room_ID"].tolist()
 
+# ================== HELPER FUNCTIONS ==================
 def safe_str(val):
     if val is None:
         return ""
@@ -90,7 +94,8 @@ def get_free_blocks(timetable, day):
         free_blocks.append(block)
     return free_blocks
 
-def allocate_session(timetable, lecturer_busy, course_room_map, day, faculty, code, duration_hours, session_type="L", is_elective=False, labs_on_days=set()):
+def allocate_session(timetable, lecturer_busy, course_room_map, day, faculty, code,
+                     duration_hours, session_type="L", is_elective=False, labs_on_days=set()):
     if session_type == "P" and day in labs_on_days:
         return False
 
@@ -235,11 +240,13 @@ def merge_and_style_cells(filename):
 
     wb.save(filename)
 
+# ================== MAIN TIMETABLE FUNCTION ==================
 def generate_timetable(courses_to_allocate, filename):
     timetable = pd.DataFrame("", index=days, columns=slot_keys)
     lecturer_busy = {day: {} for day in days}
     course_room_map = {}
     labs_on_days = set()
+    unscheduled = []  # track unscheduled
 
     electives = [c for c in courses_to_allocate if safe_str(c.get("Elective", "")) == "1"]
     non_electives = [c for c in courses_to_allocate if safe_str(c.get("Elective", "")) != "1"]
@@ -260,6 +267,7 @@ def generate_timetable(courses_to_allocate, filename):
         is_elective = (code == "Elective")
         L, T, P, S, C = parse_ltp(course.get("L-T-P-S-C", "0-0-0-0-0"))
 
+        # ---- Lectures ----
         lecture_hours_remaining = L
         attempts = 0
         while lecture_hours_remaining > 1e-9 and attempts < MAX_ATTEMPTS:
@@ -279,16 +287,24 @@ def generate_timetable(courses_to_allocate, filename):
                         lecture_hours_remaining -= 1.0
                         allocated = True
                         break
+        if lecture_hours_remaining > 1e-9:
+            unscheduled.append({"Course_Code": code, "Faculty": faculty, "Type": "Lecture", "Unscheduled_Hours": lecture_hours_remaining})
 
+        # ---- Tutorials ----
         tutorial_hours_remaining = T
         attempts = 0
         while tutorial_hours_remaining > 1e-9 and attempts < MAX_ATTEMPTS:
             attempts += 1
+            allocated = False
             for day in days:
                 if allocate_session(timetable, lecturer_busy, course_room_map, day, faculty, code, 1.0, "T", is_elective, labs_on_days):
                     tutorial_hours_remaining -= 1.0
+                    allocated = True
                     break
+        if tutorial_hours_remaining > 1e-9:
+            unscheduled.append({"Course_Code": code, "Faculty": faculty, "Type": "Tutorial", "Unscheduled_Hours": tutorial_hours_remaining})
 
+        # ---- Practicals ----
         practical_hours_remaining = P
         attempts = 0
         while practical_hours_remaining > 1e-9 and attempts < MAX_ATTEMPTS:
@@ -304,8 +320,12 @@ def generate_timetable(courses_to_allocate, filename):
                 for day in days:
                     if allocate_session(timetable, lecturer_busy, course_room_map, day, faculty, code, 1.0, "P", is_elective, labs_on_days):
                         practical_hours_remaining -= 1.0
+                        allocated = True
                         break
+        if practical_hours_remaining > 1e-9:
+            unscheduled.append({"Course_Code": code, "Faculty": faculty, "Type": "Practical", "Unscheduled_Hours": practical_hours_remaining})
 
+    # Clean excluded slots
     for day in days:
         for slot in excluded_slots:
             if slot in timetable.columns:
@@ -316,10 +336,17 @@ def generate_timetable(courses_to_allocate, filename):
     timetable.to_excel(outname, index=True)
     merge_and_style_cells(outname)
 
+    # ---- Save unscheduled ----
+    if unscheduled:
+        df_unscheduled = pd.DataFrame(unscheduled)
+        unsched_filename = f"{timestamp}_unscheduled_courses.xlsx"
+        df_unscheduled.to_excel(unsched_filename, index=False)
+        print(f"⚠️ Some sessions could not be scheduled. Saved in {unsched_filename}")
+
+    # ---- Append course info ----
     wb = load_workbook(outname)
     ws = wb.active
-
-    start_row = ws.max_row + 3 
+    start_row = ws.max_row + 3
 
     friendly_headers = {
         "Course_Code": "Course Code",
@@ -359,21 +386,26 @@ def generate_timetable(courses_to_allocate, filename):
         ws.column_dimensions[get_column_letter(col_idx)].width = min(max_length + 2, 50)
 
     wb.save(outname)
-    print(f"Saved styled timetable with course info in {outname}")
+    print(f"✅ Saved styled timetable with course info in {outname}")
 
+# ================== SPLIT AND GENERATE ==================
 def split_by_half(courses_list):
     first = [c for c in courses_list if safe_str(c.get("Semester_Half", "")) in ["1", "0"]]
     second = [c for c in courses_list if safe_str(c.get("Semester_Half", "")) in ["2", "0"]]
     return first, second
 
-c1_first, c1_second = split_by_half(courses)
-c2_first, c2_second = split_by_half(coursesECE)
-c3_first, c3_second = split_by_half(coursesDSAI)
+c1_first, c1_second = split_by_half(coursesA)
+c2_first, c2_second = split_by_half(coursesB)
+c3_first, c3_second = split_by_half(coursesECE)
+c4_first, c4_second = split_by_half(coursesDSAI)
 
-generate_timetable(c1_first, "timetable_first_halfCSE.xlsx")
-generate_timetable(c1_second, "timetable_second_halfCSE.xlsx")
-generate_timetable(c2_first, "timetable_first_halfECE.xlsx")
-generate_timetable(c2_second, "timetable_second_halfECE.xlsx")
-generate_timetable(c3_first, "timetable_first_halfDSAI.xlsx")
-generate_timetable(c3_second, "timetable_second_halfDSAI.xlsx")
+generate_timetable(c1_first, "timetable_first_halfCSEA.xlsx")
+generate_timetable(c1_second, "timetable_second_halfCSEA.xlsx")
+generate_timetable(c2_first, "timetable_first_halfCSEB.xlsx")
+generate_timetable(c2_second, "timetable_second_halfCSEB.xlsx")
+generate_timetable(c3_first, "timetable_first_halfECE.xlsx")
+generate_timetable(c3_second, "timetable_second_halfECE.xlsx")
+generate_timetable(c4_first, "timetable_first_halfDSAI.xlsx")
+generate_timetable(c4_second, "timetable_second_halfDSAI.xlsx")
+
 
