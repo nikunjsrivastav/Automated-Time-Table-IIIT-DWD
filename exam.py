@@ -438,20 +438,20 @@ class ExamScheduler:
 
 def run_example():
     departments = {
-        "CSEA-1": "coursesCSEA-I.csv",
-        "CSEA-3": "coursesCSEA-III.csv",
-        "CSEB-3": "coursesCSEB-III.csv",
-        "CSE-V": "coursesCSE-V.csv",
-        "DSAI-1": "coursesDSAI-I.csv",
-        "DSAI-3": "coursesDSAI-III.csv",
-        "DSAI-5": "coursesDSAI-V.csv",
-        "ECE-1": "coursesECE-I.csv",
-        "ECE-3": "coursesECE-III.csv",
-        "ECE-V": "coursesECE-V.csv",
-        "Sem-7": "courses7.csv"
+        "CSEA-1": "data/coursesCSEA-I.csv",
+        "CSEA-3": "data/coursesCSEA-III.csv",
+        "CSEB-3": "data/coursesCSEB-III.csv",
+        "CSE-V": "data/coursesCSE-V.csv",
+        "DSAI-1": "data/coursesDSAI-I.csv",
+        "DSAI-3": "data/coursesDSAI-III.csv",
+        "DSAI-5": "data/coursesDSAI-V.csv",
+        "ECE-1": "data/coursesECE-I.csv",
+        "ECE-3": "data/coursesECE-III.csv",
+        "ECE-V": "data/coursesECE-V.csv",
+        "Sem-7": "data/courses7.csv"
     }
-    rooms = "rooms.csv"
-    faculty = "faculty.csv"
+    rooms = "data/rooms.csv"
+    faculty = "data/faculty.csv"
 
     s = ExamScheduler(rooms, departments, faculty)
     s.generate()
