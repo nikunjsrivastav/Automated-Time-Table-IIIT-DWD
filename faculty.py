@@ -4,7 +4,6 @@ from datetime import datetime
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
 
-# --- setup ---
 random.seed(123)
 thin = Border(left=Side(style='thin'),
               right=Side(style='thin'),
@@ -20,7 +19,6 @@ colors = [
     "E8BAFF","BAFFD6","FFF2BA","DAD7FF","BFFFE1","FFDAB8","E2FFBA","BAF7FF"
 ]
 
-# --- helper ---
 def extract_info(val):
     if not isinstance(val, str) or val.strip() == "":
         return None, None
@@ -91,7 +89,8 @@ def create_faculty_timetables(fac_map, slot_order):
     ws_index.cell(1,2).font = Font(bold=True)
 
     for idx, (fac, items) in enumerate(sorted(fac_map.items()), start=2):
-        ws_index.append([fac, len(items)])
+        unique_slots = set((e['day'], e['slot']) for e in items)
+        ws_index.append([fac, len(unique_slots)])
         ws_index.cell(idx,1).border = thin
         ws_index.cell(idx,2).border = thin
 
@@ -134,14 +133,12 @@ def create_faculty_timetables(fac_map, slot_order):
     wb.save(name)
     print("✅ Faculty timetables (grid format) saved as", name)
 
-
 if __name__ == "__main__":
-    # auto detect latest timetable
     latest = max([f for f in os.listdir() if f.startswith("Balanced_Timetable_") and f.endswith(".xlsx")], key=os.path.getctime)
     csvs = [
         "data/coursesCSEA-I.csv", "data/coursesCSEB-I.csv", "data/coursesCSEA-III.csv", "data/coursesCSEB-III.csv",
         "data/coursesCSE-V.csv", "data/coursesDSAI-III.csv", "data/coursesECE-III.csv", "data/courses7.csv",
-        "data/coursesDSAI-I.csv", "data/coursesDSAI-V.csv", "data/coursesECE-I.csv", "data/coursesECE-V.csv"
+        "data/coursesDSAI-I.csv", "data/coursesDSAI-V.csv", "data.md/coursesECE-I.csv", "data/coursesECE-V.csv"
     ]
     xl = pd.ExcelFile(latest)
     df_sample = pd.read_excel(xl, sheet_name=xl.sheet_names[0], header=None)
