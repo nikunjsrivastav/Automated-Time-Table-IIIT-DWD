@@ -139,12 +139,10 @@ if __name__ == "__main__":
     # auto detect latest timetable
     latest = max([f for f in os.listdir() if f.startswith("Balanced_Timetable_") and f.endswith(".xlsx")], key=os.path.getctime)
     csvs = [
-        "coursesCSEA-I.csv", "coursesCSEB-I.csv", "coursesCSEA-III.csv", "coursesCSEB-III.csv",
-        "coursesCSE-V.csv", "coursesDSAI-III.csv", "coursesECE-III.csv", "courses7.csv",
-        "coursesDSAI-I.csv", "coursesDSAI-V.csv", "coursesECE-I.csv", "coursesECE-V.csv"
+        "data/coursesCSEA-I.csv", "data/coursesCSEB-I.csv", "data/coursesCSEA-III.csv", "data/coursesCSEB-III.csv",
+        "data/coursesCSE-V.csv", "data/coursesDSAI-III.csv", "data/coursesECE-III.csv", "data/courses7.csv",
+        "data/coursesDSAI-I.csv", "data/coursesDSAI-V.csv", "data/coursesECE-I.csv", "data/coursesECE-V.csv"
     ]
-
-    # get slot order from any timetable sheet
     xl = pd.ExcelFile(latest)
     df_sample = pd.read_excel(xl, sheet_name=xl.sheet_names[0], header=None)
     slot_row_idx = df_sample.index[df_sample.iloc[:,0] == "Day"].tolist()[0]
