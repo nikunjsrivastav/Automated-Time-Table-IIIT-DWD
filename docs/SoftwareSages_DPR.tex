@@ -1,0 +1,1521 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{setspace}
+\usepackage{a4}
+\usepackage{amssymb,amsmath,amsthm,latexsym}
+\usepackage{amsfonts}
+\usepackage{amsfonts}
+\usepackage{array}
+\usepackage[numbers]{natbib}
+\bibliographystyle{plainnat}
+\usepackage{float}
+\usepackage[nottoc]{tocbibind}
+\usepackage{url}
+\usepackage{hyperref}
+\setlength{\parindent}{1.0cm} \setlength{\evensidemargin}{0.0cm}
+\setlength{\oddsidemargin}{0.0cm} \setlength{\topmargin}{0.0cm}
+
+\textwidth 17cm \textheight 20cm
+\onehalfspacing
+
+
+
+\usepackage{microtype}
+\usepackage{tablefootnote}
+\usepackage{threeparttable}  
+\usepackage{booktabs}
+\usepackage{caption}
+\captionsetup{justification   = raggedright,
+              singlelinecheck = false}
+\usepackage{bm}
+\usepackage{stfloats}
+\usepackage{mathrsfs}
+\usepackage{tabularx}
+%\usepackage{algpseudocode}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{nicematrix}
+\usepackage[thinlines]{easytable}
+\usepackage{enumitem}
+\usepackage{textcomp}
+\usepackage{subcaption}
+
+\usepackage{amsmath}
+\usepackage{adjustbox}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{graphicx}
+\captionsetup[subfigure]{font=footnotesize}
+\makeatletter
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\lstset{frame=tb,
+  language=Java,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+}
+
+\usepackage[justification=centering]{caption}
+
+\usepackage{multicol}
+\usepackage{longtable}
+%\usepackage{biblatex}
+
+\usepackage{algorithm,algorithmic}
+\def\newblock{\hskip .11em plus .33em minus .07em}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+		T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+
+
+
+
+\usepackage[justification=centering]{caption}
+
+\usepackage{multicol}
+\usepackage{longtable}
+
+\AtBeginEnvironment{procedure}{\let\c@algocf\c@procedure}
+\makeatother
+
+%\usepackage{natbib}
+\usepackage{tablefootnote}
+\usepackage{threeparttable}  
+\usepackage{multirow}
+\usepackage{textcomp}
+\newtheorem{definition}{Definition}
+\usepackage{subcaption}
+\usepackage{adjustbox}
+\usepackage{graphicx}
+\usepackage{graphics}
+\usepackage{float}
+\usepackage{etoolbox}
+\newcounter{procedure}
+\makeatletter
+\AtBeginEnvironment{procedure}{\let\c@algocf\c@procedure}
+\makeatother
+\usepackage[font=footnotesize]{caption}
+\captionsetup[table]{labelsep=newline}
+%\captionsetup[ruled]{labelsep=period}
+\captionsetup[figure]{labelsep=period}
+%\captionsetup[subfigure]{labelsep=period}
+\captionsetup[subfigure]{font=footnotesize}
+\makeatletter
+\usepackage{algorithm,algorithmic}
+\def\newblock{\hskip .11em plus .33em minus .07em}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+		T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+%\usepackage{algorithmicx}
+\usepackage{amssymb}
+\usepackage{float}
+\usepackage{amsthm,xpatch,amsmath}
+\usepackage{amsmath}
+\makeatletter
+\xpatchcmd{\@thm}{\fontseries\mddefault\upshape}{}{}{} % same font as thm-header
+\makeatother
+%\theoremstyle{definition}
+%\newtheorem{definition}{Definition}
+%\theoremstyle{example}
+%\newtheorem{example}{Example}
+%\theoremstyle{lemma}
+\newtheorem{lemma}{Lemma}
+\usepackage{listings}
+\usepackage{color}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\lstset{frame=tb,
+  language=Java,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,} 
+\newcommand*{\comb}[2]{{}^{#1}C_{#2}}%
+\newcommand{\RNum}[1]{\lowercase\expandafter{\romannumeral #1\relax}}
+\makeatletter
+\@dblfptop 0pt
+\makeatother
+
+
+
+
+
+
+
+\begin{document}
+\begin{titlepage}
+\doublespacing
+
+\begin{center}
+\par {\small \textbf{DETAILED PROJECT REPORT}}\\
+\end{center}
+
+\begin{center}
+	\par {\small \textbf{on}}
+\end{center}
+
+%\par~
+
+\begin{center}
+{\small \textbf{AUTOMATED TIME-TABLE SCHEDULING FOR IIIT DHARWAD}}
+\end{center}
+
+{\small
+\begin{center}
+\par \small {Submitted by}
+\par \small \textbf{Team: }\textbf{$SoftwareSages$}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.2\linewidth]{bitmap.png}
+\end{figure}
+\par \small \textbf{Nikunj Srivastav} \textbf{24BCS087}
+\par \small \textbf{Sudhanshu Baberwal} \textbf{24BCS147}
+\par \small \textbf{Thejas Gowda U M
+} \textbf{24BCS157}
+\par \small \textbf{Shaik Moiz
+} \textbf{24BCS133}
+
+
+\par Under the guidance of
+\par \small \textbf{Vivekraj VK}
+\par \textbf{Assistant Professor}
+\end{center}
+
+}
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[height=.5in]{image.png}
+\end{center}
+\end{figure}
+\begin{center}
+\par{\mbox {\small\textbf{DEPARTMENT OF COMPUTER SCIENCE AND ENGINEERING}}}
+\noindent{\mbox{\small \textbf{ INDIAN INSTITUTE OF INFORMATION TECHNOLOGY
+DHARWAD}}}\\
+12/08/2025
+
+\end{center}
+\end{titlepage}
+
+
+%\newpage
+%\thispagestyle{empty}
+%%\mbox{}
+%\clearpage             %rest of the page is left blank in the title page
+%\thispagestyle{empty}  % to remove the page number from the empty page
+%\phantom{a}            %the particular page is left blank i.e. the command leaves a space of size a. The command \newpage begins the next text in the newpage. So the page is left blank.The command produces a blank space.
+%%\vfill
+%\newpage
+%\thispagestyle{empty}
+%
+%\begin{center}
+%	
+%	\emph{\huge{Certificate}}\\[2.5cm]
+%\end{center}
+%\normalsize This is to certify that the project, entitled \textbf{XXX}, is a bonafide record of the Mini Project coursework presented by the students whose names are given below during $<$Academic Year here$>$ in partial fulfilment of the requirements of the degree of Bachelor of Technology in Computer Science and Engineering.\\[1.0cm]
+%
+%\begin{table}[h]
+%	\centering
+%	\begin{tabular}{lr}
+%		Roll No & Names of Students \\ \\ \hline
+%		\\
+%		$<$Roll no here$>$ &$<$Name here$>$ \\ 
+%		$<$Roll no here$>$ &$<$Name here$>$ \\ 
+%		$<$Roll no here$>$ &$<$Name here$>$ \\ 
+%	\end{tabular}
+%\end{table}
+%
+%\vfill
+%
+%
+%% Bottom of the page
+%\begin{flushright}
+%	$<$Supervisor name here$>$\\
+%	(Project Supervisor )\\[1.5cm]
+%	%<Coordinator name here>\\
+%	%(Course Coordinator)\\
+%\end{flushright}
+
+\newpage
+\pagenumbering{roman}
+\setcounter{page}{1}
+\tableofcontents
+\newpage
+\listoffigures
+\newpage
+\listoftables
+\newpage
+
+
+\newpage
+\thispagestyle{empty}
+%\mbox{}
+\clearpage             %rest of the page is left blank in the title page
+\thispagestyle{empty}  % to remove the page number from the empty page
+\phantom{a}            %the particular page is left blank i.e. the command leaves a space of size a. The command \newpage begins the next text in the newpage. So the page is left blank.The command produces a blank space.
+%\vfill
+
+
+\section{Introduction}
+\pagenumbering{arabic}
+In academic institutions, especially at the college level, the timetable serves as a foundational framework that dictates the schedule of lectures, practical sessions, and academic activities. Despite its critical role, timetable systems are often complex, manually designed, and prone to inefficiencies. The traditional method of timetable management involves static spreadsheets or documents that lack adaptability and often demand significant cognitive effort from students and faculty alike to interpret and follow. Much like navigating a city without a map, understanding such disorganized schedules can be time-consuming, error-prone, and frustrating.\newline
+
+In the context of a fast-paced academic environment, where clarity and efficiency are paramount, the need for an automated timetable system becomes apparent. Automation not only streamlines the process of generating and updating schedules but also enhances accessibility, consistency, and user experience. With advancements in computational tools and algorithms, it is now feasible to design systems that can dynamically create and manage timetables based on a set of academic constraints and user preferences.\newline
+
+This document aims to explore the automation of the college timetable by analyzing the limitations of the existing system, modeling the essential requirements for an automated solution, and proposing a structured approach to its implementation. The goal is to reduce the overhead associated with manually decoding schedules and to introduce a system that is both intuitive and scalable. In essence, automating the timetable is akin to replacing a static road map with a GPS system—responsive, intelligent, and efficient.
+\subsection{Constraints on the System}
+When creating an automated timetable system, the following constraints must
+be considered to ensure that the generated schedule is practical and efficient:
+\begin{itemize}
+    \item Instructor Availability: Each instructor has specific workdays and hours.
+The system shouldn’t assign them when they’re not available.
+\item Limitations on Classrooms and Resources: A limited number of class-
+rooms and labs are available. The system must prevent reservations from
+overlapping.
+\item Course Requirements: A number of courses require specific equipment, like
+computer labs, which need to be allocated appropriately.
+\item Overlapping of Sessions: Neither a teacher nor a student may be enrolled
+in two classes at the same time.
+\item Working Hours and Breaks: Lectures should be planned around regular
+business hours, accounting for intermissions and lunch breaks.
+\item Balanced Workload: The system should distribute lectures evenly through-
+out the week to avoid overloading instructors or students on a single day.
+\item Priority Rules: Certain courses (like core subjects) may need to be given
+more weight than electives when allocating slots.
+\item Semester/Batch Dependencies: Students should not be enrolled in classes
+that conflict with required subjects during the same semester.
+\end{itemize}
+\subsection{Available Infrastructure}
+The automated timetable system will operate within the existing institutional
+infrastructure:
+\begin{itemize}
+    \item Classrooms should be equipped with enough seating and basic teaching
+facilities.
+\item Computer and electronic labs are required for certain courses.
+\item List of professors along with their preferred teaching slots.
+\item Google calendar to be integrated with the timetable for easy access.
+\item Institutional servers and computers that can host the timetable generation
+system.
+\end{itemize}
+\newpage
+\section{Existing System}
+The current timetable system employed by the institution is a manually designed and visually dense framework that attempts to accommodate a wide range of academic activities across multiple disciplines. While the system technically fulfills its functional purpose — mapping courses to time slots, classrooms, and instructors — it presents significant usability and comprehension challenges to the students. This section provides a detailed overview of the existing system’s structure, the difficulties associated with it, and the broader implications of its shortcomings.
+\newline
+
+
+\subsection{Overview of the Timetable
+}
+The present timetable consists of two main components:
+\begin{itemize}
+    \item Course Information Table:
+This table outlines essential details of each course, including:
+\begin{itemize}
+\item Course Code and Title (e.g., MA261 - Differential Equations)
+\item
+Credit Structure (L-T-P-S-C format | Lecture-Tutorial-Practical-Self Study-Credits)
+\item Assigned Faculty
+\item Lab Assistance (if applicable)
+\item Section-wise Slot and Classroom Mapping (e.g., C2, C004)
+\end{itemize}
+The academic load includes core subjects like Differential Equations, Operating Systems, and Design and Analysis of Algorithms, along with open electives and minor courses. Each subject is allocated specific slots (A1, B1, C1, etc.) and laboratories (L1 to L15), with classrooms changing depending on the section (A or B).
+
+\item Weekly Slot-Based Schedule (Time Table Grid):
+\newline
+A second visual representation provides a weekly calendar spanning Monday to Friday, with time slots beginning at 07:30 AM and extending beyond 06:30 PM. Courses are mapped to slot identifiers (e.g., A1, L2, Z-T) rather than course names, which requires manual cross-referencing with the course information table.
+\end{itemize}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{t1.png}
+    \caption{The front page providing the slots}
+    \label{fig:placeholder}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{lastsem.png}
+    \caption{The Last-SEM time-table}
+    \label{fig:placeholder}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{t2.png}
+    \caption{The section for the Alphanumeric codes for IIIrd SEM}
+    \label{fig:placeholder}
+\end{figure}
+\newpage
+\subsection{Problems in the Existing System}
+Despite the structured presentation, the existing timetable poses several operational and cognitive difficulties, particularly from the students’ perspective. The following outlines the major issues observed:
+\begin{itemize}
+    \item Complex Cross-Referencing:
+    \newline
+Students must frequently switch between the two tables: the timetable grid and the course mapping table, to identify which course is scheduled at any given time.
+\newline
+Slots such as “C1” or “L12” do not inherently indicate the subject, instructor, or location. These details must be manually interpreted by matching the slot with the corresponding entry in the course table.
+\newline
+For instance, to know what “C1” on Thursday at 10:00 AM represents, students must refer back to the course list and locate all subjects that use “C1” (e.g., CS263 and CS264 for Section A and B respectively).
+\item Non-Uniform Slot Utilization:
+\newline
+Courses are not Utilized/distributed throughout the day. Some days are heavily loaded (e.g., Wednesday and Thursday), while others like Monday have lighter schedules.
+\newline
+Certain time slots (e.g., 07:30–09:00 and post-06:30 PM) are dedicated to minor courses or elective modules but are inconsistently populated across the week, adding to scheduling confusion.
+\item Lack of Personalization:
+\newline
+The timetable is designed generically for entire sections (A and B), with no student-level customization.
+\newline
+Students taking open electives, minor courses, or interdisciplinary subjects must manually identify and filter their relevant entries from the pool of possible slots.
+\item Visual Overload and Color Clutter:
+\newline
+While colors are used to differentiate slots, the sheer variety of colors used for A1–E2, L1–L15, and Z/U/X slots leads to visual fatigue.
+\newline
+There is no legend or guide to explain the meaning of the color codes, leaving interpretation up to the students.
+\item Scattered Course Information:
+\newline
+Information such as course credits, lab assistance, and faculty details are buried within the course table and are not accessible when viewing the slot-based schedule alone.
+\end{itemize}
+For example, students cannot immediately know the number of contact hours for CS263 unless they inspect the "Credits (L-T-P-S-C)" column.
+
+\subsection{Implications of the Current System}
+The complexity of the current timetable has several negative downstream effects:
+\begin{itemize}
+    \item Cognitive Load: Students invest significant time and mental effort decoding their daily and weekly schedules, often leading to errors or missed classes.
+    \item Inefficient Time Management: Without a clear, consolidated view of their personal schedule, students struggle to plan study sessions, extracurriculars, or breaks.
+    \item Administrative Overhead: Faculty and staff must manually resolve conflicts or handle queries regarding slot clashes and classroom confusion.
+    \item Low Scalability: As class sizes increase or new electives/minors are introduced, the manual nature of the timetable system becomes increasingly unsustainable.
+\end{itemize}
+\section{Requirements Modeling}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{usecase2.png}
+    \caption{Use-Case Diagram for Automated Time-Table}
+    \label{fig:placeholder}
+\end{figure}
+As a student in a highly competitive academic environment, efficient time management, clarity of schedule, and adaptability to academic changes are crucial. An automated timetable system must address the inefficiencies of the current static system and offer features that improve accessibility, personalization, and reliability. The following are the key functional and non-functional requirements that the proposed automated system must fulfill:
+
+
+
+\newpage
+\subsection{Functional Requirements}  
+% \subsubsection*{Functional Requirements}
+% \begin{table}[H]
+% \begin{tabular}{|p{5cm}|p{10cm}|}
+% \hline
+% \textbf{Feature} & \textbf{Description} \\
+% \hline
+% Automated Course-to-Slot Mapping & Automatically assigns each registered course to its respective time slot and classroom without manual cross-referencing. \\
+% \hline
+% Student-Centric View & Generates a personalized timetable for each student based on their registered courses (core, elective, minor). \\
+% \hline
+% Interactive Visual Timetable & Provides a clean, color-coded interface displaying the weekly schedule with course names, faculty, classroom numbers, and type (lecture/lab). \\
+% \hline
+% Real-Time Conflict Detection & Flags slot clashes (e.g., overlapping electives or labs) during registration or timetable updates. \\
+% \hline
+% Lab Integration and Mapping & Clearly integrates lab sessions within the weekly view, showing timings, locations (e.g., L107, L207), and associated course names. \\
+% \hline
+% Mid-Sem/Post-Sem Scheduling Updates & Supports dynamic updates for courses starting after mid-semester, with notifications or versioning. \\
+% \hline
+% Faculty and Classroom Information & Allows viewing of faculty allocations and classroom details linked to each course. \\
+% \hline
+% Export and Print Feature & Enables export of personal timetables as PDF/image formats for offline use or printing. \\
+% \hline
+% Time Block Highlighting & Highlights free slots and gaps to help students plan self-study, meetings, or extra-curriculars. \\
+% \hline
+% Calendar Integration & Provides optional synchronization with calendar apps (Google Calendar, Outlook) with alerts. \\
+% \hline
+% \end{tabular}
+% \caption{List of Functional Requirements}
+% \label{fig:placeholder}
+% \end{table}
+% \subsubsection*{Non-Functional Requirements}
+% \begin{table}[H]
+% \centering
+% \begin{tabular}{|p{5cm}|p{10cm}|}
+% \hline
+% \textbf{Feature} & \textbf{Description} \\
+% \hline
+% User-Friendly Interface & Intuitive, responsive, and accessible across mobile, tablet, and desktop. \\
+% \hline
+% Scalability & Handles a large number of students, courses, and elective combinations without performance issues. \\
+% \hline
+% Accessibility and Availability & 24/7 accessibility with support for accessibility standards (e.g., screen readers, contrast). \\
+% \hline
+% Security and Data Privacy & Protects student data with authentication and encryption practices. \\
+% \hline
+% Low Maintenance Overhead & Designed for easy updates during curriculum revisions or semester transitions. \\
+% \hline
+% \end{tabular}
+% \caption{List of Non-Functional Requirements}
+% \label{fig:placeholder}
+% \end{table}
+% \newpage
+
+
+
+
+
+
+
+\subsubsection{Timetable Generation}
+\begin{itemize}
+\item The system shall automatically assign each registered course to its respective time slot and classroom, eliminating manual mapping.
+
+\item The system shall integrate lab sessions clearly within the weekly timetable, showing lab room numbers and associated course names.
+
+\item The system shall support updates for courses that start mid-semester or post-semester, ensuring accurate timetables throughout the academic period.
+\end{itemize}
+
+\subsubsection{Student Personalization}
+\begin{itemize}
+\item The system shall generate a personalized timetable for each student based on their registered courses, including core, elective, and minor subjects.
+
+\item The system shall highlight free time slots in the student timetable to assist with self-study, meetings, or extracurricular planning.
+
+\item The system shall allow students to export their personalized timetables as PDF or image formats for offline viewing or printing.
+
+\item The system shall provide optional synchronization with calendar apps (Google Calendar, Outlook) and support alerts for upcoming sessions.
+\end{itemize}
+
+\subsubsection{Visual Interface and Usability}
+\begin{itemize}
+\item The system shall display a weekly, interactive, and color-coded timetable interface, including course names, faculty, room numbers, and session type (lecture/lab).
+
+\item The system shall allow users to view faculty assignments and classroom details linked to each course.
+\end{itemize}
+
+\subsubsection{Conflict Management and Validation}
+\begin{itemize}
+\item The system shall detect and flag scheduling conflicts (e.g., overlapping electives or labs) during course registration or when the timetable is updated.
+
+\item The system shall prevent the assignment of the same resource (faculty, room) to multiple sessions in the same time slot.
+\end{itemize}
+
+
+
+
+
+\subsection{Non-Functional Requirements}
+\subsubsection{Performance Requirements}
+\begin{itemize}
+\item The system shall process conflict detection operations in real time, providing feedback within 1 second of input.
+
+\item The timetable generation process for a department shall complete within 15 seconds of input submission.
+
+\item The system shall support concurrent access by up to 500 users without noticeable performance degradation.
+\end{itemize}
+
+\subsubsection{Usability and Interface Requirements}
+\begin{itemize}
+\item The visual timetable shall be intuitive, color-coded, and mobile-friendly to ensure ease of use for students and faculty.
+
+\item Tooltips, icons, and minimal-click interactions shall be incorporated to reduce user learning time.
+
+\item Students and faculty shall require no more than 15 minutes of training to use the system effectively.
+\end{itemize}
+
+\subsubsection{Reliability and Availability}
+\begin{itemize}
+\item The system shall maintain at least 99.5% uptime during academic and exam periods.
+
+\item In case of system failure, automatic recovery shall occur within 2 minutes without data loss.
+
+\item All changes (manual or automated) shall be logged with version control for auditing.
+\end{itemize}
+
+\subsubsection{Security Requirements}
+\begin{itemize}
+\item Only authorized users (e.g., admins, faculty) shall have access to modification features, enforced via role-based access control (RBAC).
+
+\item All communication between clients and the server shall be encrypted using SSL/TLS protocols.
+
+\item Sensitive user data (e.g., student schedules, faculty assignments) shall be stored securely with access logging and anonymized backups.
+\end{itemize}
+
+\subsubsection{Interoperability and Integration}
+\begin{itemize}
+\item The system shall support exporting timetables in PDF, image, and CSV formats.
+
+\item Calendar integration shall support standard calendar protocols (e.g., iCal) for compatibility with Google Calendar, Outlook, etc.
+
+\item The system shall be compatible with all modern browsers: Chrome, Firefox, Edge, and Safari.
+\end{itemize}
+
+\subsubsection{Maintainability and Scalability}
+\begin{itemize}
+\item The system architecture shall be modular and well-documented to support maintenance and future enhancements.
+
+\item It shall be scalable to accommodate:
+
+\item Additional departments and courses
+
+\item Increased numbers of concurrent users
+
+\item Larger elective groups or cross-department registrations
+\end{itemize}
+
+
+
+
+
+
+\section{Examination : Existing Model}
+In the college, the current examination timetable is managed using a manual or semi-digital process. Typically, academic administrators or examination controllers create the schedule using spreadsheet software like Microsoft Excel or even handwritten drafts. The timetable is designed based on departmental inputs, subject lists, and exam duration guidelines, following institutional academic calendars.\newline
+
+The process begins with the collection of subject-wise exam requirements from each department. Dates are then assigned manually, ensuring that department-specific subjects are distributed across the exam window. Room allocations are performed based on estimated student strength and hall capacities, usually with limited software assistance.\newline
+
+Once finalized, the timetable is circulated as a single master document, usually in PDF or Excel format. This document includes course codes, subject names, exam dates, times, and corresponding room numbers. It is posted on college notice boards, sent via email, or uploaded to the college intranet or website.\newline
+
+Students are expected to refer to this master document, cross-check their registered subjects, and extract their own schedules. No personalization, automated clash detection, or centralized access system is typically provided in this model.\newline
+
+This method, though widely used, is still largely dependent on manual data entry and oversight.
+
+
+
+
+
+
+
+
+\newpage
+\section{Existing Model : The Challenges}
+
+In a national college like IIIT DHARWAD, where hundreds of students from multiple departments take diverse courses, managing an examination timetable manually is not only outdated but incredibly inefficient. As a Computer Science student, the stark contrast between manual processes and automated systems is striking—especially when we face the chaos of exam season.\newline
+
+\subsection{Challenges faced by  the Scheduler}
+
+\textbf{1. Scheduling Conflicts\newline}
+
+Creating a manual exam timetable involves coordinating a lot of courses, overlapping electives, and varied program structures. Human schedulers must:
+
+\begin{itemize}
+\item Avoid subject overlaps for students with electives from different departments.
+
+\item Ensure no student has two exams in a single day or back-to-back sessions.
+
+\item Prevent staff and room clashes.
+\end{itemize}
+
+The sheer volume of permutations makes manual planning a nightmare. A single misstep can lead to last-minute changes, impacting thousands.\newline\\
+\textbf{2. Room Allocation Problems}
+
+Assigning appropriate rooms manually is riddled with inefficiencies:
+
+\begin{itemize}
+     
+\item Large courses may be assigned to smaller rooms, leading to overcrowding.
+
+\item Rooms may be double-booked, especially during peak slots.
+
+\item Facilities like projectors or special seating (needed for specific exams) are often overlooked.
+\end{itemize}
+
+\newpage
+
+\noindent\textbf{3. Lack of Real-Time Visibility}
+
+Manual schedules are typically released as static PDFs or Excel sheets. If a change occurs:
+
+\begin{itemize} 
+\item Students may not be informed promptly.
+
+\item Version control becomes difficult.
+
+\item Miscommunication spreads confusion.
+\end{itemize}
+
+
+
+\subsection{Challenges faced by the Student}
+
+
+\textbf{1. Complex Layouts}
+
+Manual schedules are often crammed tables with course codes, dates, and rooms—all in small font and poorly organized. This leads to:
+
+\begin{itemize}
+\item Students misreading dates or room numbers.
+
+\item Increased dependency on word-of-mouth updates.
+\end{itemize}
+
+\noindent\textbf{2. Scattered Locations}
+
+The campuses has multiple blocks and annexes. Without proper mapping:
+\begin{itemize}
+\item First-year students often struggle to find halls.
+
+\item Students waste crucial pre-exam minutes locating their venue.
+
+\item Delays and unnecessary stress become common.
+\end{itemize}
+
+\noindent\textbf{3. No Personalization}
+
+Every student must decode the timetable based on their subjects. Manual systems do not offer:
+
+\begin{itemize}   
+\item Individualized schedules.
+
+\item Alerts or reminders.
+
+\item Location guidance.
+\end{itemize}
+This lack of personalization leads to missed exams or misinformed attendance.
+
+
+
+
+
+
+\section{Existing Model : The Solution}
+\newline
+\textbf{1. Efficient Scheduling Algorithms}
+
+Automated systems can use constraint-based scheduling algorithms to:
+
+\begin{itemize}
+\item Avoid conflicts across departments and electives.
+
+\item Optimize room usage.
+
+\item Distribute exams to reduce stress on students and faculty.
+\end{itemize} 
+
+\noindent\textbf{2. Smart Room Allocation}
+
+AI and optimization models can:
+
+\begin{itemize}
+\item Assign rooms based on real-time capacity and requirements.
+
+\item Ensure accessibility for students with special needs.
+
+\item Prevent double-bookings and underutilization.
+\end{itemize}
+
+\noindent\textbf{3. Student-Centric Access}
+
+Automation enables:
+
+\begin{itemize}
+\item Personalized exam schedules via web portals.
+
+\item Map integration for hall locations.
+
+\item Notifications for time, venue, and changes.
+\end{itemize}
+
+\noindent\textbf{4. Real-Time Updates}
+
+Changes in schedule, venue, or invigilation can be pushed instantly to stakeholders. This drastically reduces errors and last-minute panic.
+
+
+%In today’s tech-driven academic world, continuing with manual examination timetable management is both inefficient and irresponsible. As Computer Science students, we not only understand the burden of such systems but also have the tools to build smarter, scalable, and more student-friendly solutions. Automation doesn’t just simplify logistics—it transforms the exam experience for everyone involved.
+
+
+
+
+
+\section{Requirements for Automating the Examination Timetable}
+\subsection{Functional Requirements}
+% Automation of the examination timetable in a large, top-tier national college requires collecting and organizing multiple types of structured data. These inputs are essential for designing a conflict-free, efficient, and scalable scheduling system. Below is a categorized list of the necessary inputs:
+
+% Below are the tables having the Requirements for Automating the Examination Timetable
+% \begin{table}[H]
+%     \centering
+%     \resizebox{\textwidth}{!}{%
+%     \begin{tabular}{|p{4cm}|p{11cm}|}
+%     \hline
+%         \textbf{Course and Subject Data} & 
+%         \begin{itemize}
+%             \item List of all courses and subjects offered during the semester.
+%             \item Subject codes and titles (used for easy mapping and display).
+%             \item Department-wise categorization of subjects.
+%             \item Credit hours and subject types (theory, lab, elective, core, etc.).
+%             \item Subject enrollment numbers (total number of students registered for each course).
+%         \end{itemize} \\ \hline
+        
+%         \textbf{Student Information} & 
+%         \begin{itemize}
+%             \item Student enrollment data, including: Student ID, Registered subjects, Department and year of study.
+%             \item Elective combinations, to avoid exam clashes between electives and core subjects.
+%             \item Special accommodations (e.g., students requiring extra time or specific seating).
+%         \end{itemize} \\ \hline
+%     \end{tabular}}
+%     \caption{Examination Timetable Data (Course and Student Information)}
+%     \label{tab:exam_data1}
+% \end{table}
+% \newpage
+% \begin{table}[H]
+%     \centering
+%     \resizebox{\textwidth}{!}{%
+%     \begin{tabular}{|p{4cm}|p{11cm}|}
+%     \hline
+%         \textbf{Faculty and Invigilator Availability} & 
+%         \begin{itemize}
+%             \item Faculty allocation for each subject.
+%             \item Faculty availability schedule, including leaves or other duties.
+%             \item Preferred time slots for invigilators (optional but helpful for efficiency).
+%             \item Maximum number of exams a faculty member can supervise per day.
+%         \end{itemize} \\ \hline
+        
+%         \textbf{Examination Parameters} & 
+%         \begin{itemize}
+%             \item Exam duration for each subject.
+%             \item Exam type (theory, lab, viva).
+%             \item Exam window (total number of days and working hours per day).
+%             \item Institutional constraints, such as:
+%             \begin{itemize}
+%                 \item No exams on weekends or public holidays.
+%                 \item Maximum exams per student per day.
+%             \end{itemize}
+%         \end{itemize} \\ \hline
+%     \end{tabular}}
+%     \caption{Examination Timetable Data (Faculty and Examination Parameters)}
+%     \label{tab:exam_data2}
+% \end{table}
+% \newpage
+% \begin{table}[H]
+%     \centering
+%     \resizebox{\textwidth}{!}{%
+%     \begin{tabular}{|p{4cm}|p{11cm}|}
+%     \hline
+%         \textbf{Room and Hall Details} & 
+%         \begin{itemize}
+%             \item List of available examination halls and classrooms.
+%             \item Seating capacity of each room.
+%             \item Special facility tags (projector, AC, wheelchair access, etc.).
+%             \item Block and floor information (for map-based student guidance).
+%         \end{itemize} \\ \hline
+        
+%         \textbf{Rules and Constraints} & 
+%         \begin{itemize}
+%             \item Clash rules (no overlapping exams for students).
+%             \item Cooling-off time (minimum gap between exams for any student).
+%             \item Departmental separation (e.g., avoid scheduling same-department exams at the same hour).
+%             \item Room distribution rules (e.g., ensure social distancing, split large courses across multiple rooms).
+%         \end{itemize} \\ \hline
+        
+%         \textbf{System and User Requirements} & 
+%         \begin{itemize}
+%             \item Admin panel access for timetable managers.
+%             \item Student portal or app interface to view personalized schedules.
+%             \item Real-time update support for last-minute changes.
+%         \end{itemize} \\ \hline
+%     \end{tabular}}
+%     \caption{Examination Timetable Data (Room, Rules, and System Requirements)}
+%     \label{tab:exam_data3}
+% \end{table}
+
+
+
+
+
+
+
+
+
+
+\subsubsection{Course and Subject Data}
+\begin{itemize}
+\item The system shall maintain a list of all courses and subjects offered during the semester.
+
+\item The system shall store subject codes and titles to enable easy mapping and display.
+
+\item The system shall categorize subjects department-wise for accurate allocation and filtering.
+
+\item The system shall record credit hours and subject types (e.g., theory, lab, elective, core).
+
+\item The system shall track subject enrollment numbers to ensure suitable room allocation.
+\end{itemize}
+
+\subsubsection{Student Information Management}
+\begin{itemize}
+\item The system shall store and manage student enrollment data, including student ID, registered subjects, department, and year of study.
+
+\item The system shall account for elective combinations to avoid examination clashes.
+
+\item The system shall store and apply special accommodations for specific students (e.g., extra time, special seating).
+\end{itemize}
+
+\subsubsection{Faculty and Invigilator Availability}
+\begin{itemize}
+\item The system shall maintain a mapping of faculty allocations for each subject.
+
+\item The system shall allow input of faculty availability schedules, including leaves or other duties.
+
+\item The system shall optionally record preferred invigilation time slots.
+
+\item The system shall limit the number of exams a faculty member can supervise per day.
+\end{itemize}
+
+\subsubsection{Examination Parameters}
+\begin{itemize}
+\item The system shall allow configuration of exam durations per subject.
+
+\item The system shall support multiple exam types (e.g., theory, lab, viva).
+
+\item The system shall define the examination window (total number of exam days and working hours per day).
+
+\item The system shall enforce institutional constraints such as:
+
+\item No exams on weekends or public holidays.
+
+\item Maximum number of exams per student per day.
+\end{itemize}
+
+\subsubsection{Room and Hall Management}
+\begin{itemize}
+\item The system shall maintain a list of available examination halls and classrooms.
+
+\item The system shall store seating capacity for each room.
+
+\item The system shall tag rooms with special facilities (e.g., projector, AC, wheelchair access).
+
+\item The system shall include block and floor information for map-based student navigation.
+\end{itemize}
+
+\subsubsection{Rules and Constraints Enforcement}
+\begin{itemize}
+\item The system shall enforce clash rules to ensure no overlapping exams for any student.
+
+\item The system shall enforce a minimum cooling-off period between exams for each student.
+
+\item The system shall avoid scheduling same-department exams at the same hour.
+
+\item The system shall implement room distribution logic to ensure compliance with rules (e.g., social distancing, splitting large courses across multiple rooms).
+\end{itemize}
+
+\subsubsection{System and User Interfaces}
+\begin{itemize}
+\item The system shall provide an admin panel for timetable managers to manage all data inputs and configurations.
+
+\item The system shall offer a student-facing portal or app interface to view personalized schedules.
+
+\item The system shall support real-time updates for last-minute changes in the exam schedule.
+\end{itemize}
+
+
+
+
+\subsection{Non-Functional Requirements}
+\subsubsection{Performance Requirements}
+\begin{itemize}
+\item The system shall generate complete examination timetables for a department within 15 seconds of input submission.
+
+\item The system shall support simultaneous access by at least 500 users without performance degradation.
+
+\item Timetable views (for students/faculty) shall load in under 2 seconds under normal network conditions.
+\end{itemize}
+
+\subsubsection{Usability Requirements}
+\begin{itemize}
+\item The system shall feature a responsive, intuitive UI requiring minimal training for admin staff and faculty.
+
+\item The student portal shall present personalized schedules in a clean, color-coded, and mobile-friendly format.
+
+\item Tooltips and help icons shall be available for every major operation in the admin panel.
+\end{itemize}
+
+\subsubsection{Reliability and Availability}
+\begin{itemize}
+\item The system shall maintain 99.5 % uptime during examination periods.
+
+\item System recovery from crash or power failure shall not exceed 2 minutes, and no data shall be lost during rollback.
+\end{itemize}
+
+\subsubsection{Scalability}
+\begin{itemize}
+\item The system architecture shall support future expansion to accommodate:
+
+\item Additional departments or campuses
+
+\item Multiple concurrent examination sessions
+
+\item Large-scale elective courses with hundreds of students
+\end{itemize}
+
+\subsubsection{Security Requirements}
+\begin{itemize}
+\item Only authenticated users shall access admin functionalities; role-based access control shall be enforced.
+
+\item All communication between client and server shall be SSL/TLS encrypted.
+
+\item Student and faculty data shall be securely stored following data protection guidelines (e.g., anonymized logs, encrypted storage).
+\end{itemize}
+
+\subsubsection{Compatibility and Integration}
+\begin{itemize}
+\item The system shall be compatible with modern web browsers (Chrome, Firefox, Safari, Edge).
+
+\item The system shall optionally support integration with external calendar apps like Google Calendar and Microsoft Outlook.
+
+\item Exported timetables shall be downloadable in PDF, CSV, and image formats.
+\end{itemize}
+
+\subsubsection{Maintainability and Modifiability}
+\begin{itemize}
+% \item The system codebase shall be modular and well-documented to support easy maintenance and future enhancements.
+
+\item Configuration files shall support editable rules for constraints (e.g., max exams per day, blackout dates) without changing source code.
+\end{itemize}
+
+
+
+
+
+\section{Software Design}
+These are the Data flow Diagrams of our model/software:
+\subsection{Data Flow Diagrams}
+\subsubsection{Level 0:}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{Screenshot 2025-09-09 144103.png}
+        \caption{Level - 0 of the Automated Time-Table DFD}
+    \label{fig:placeholder}
+\end{figure}
+\subsubsection{Level 1:}
+\begin{figure}[H]
+        \centering
+        \includegraphics[width=1\linewidth]{Screenshot 2025-08-26 154730.png}
+        \caption{Level - 1 of the Automated Time-Table DFD}
+        \label{fig:placeholder}
+    \end{figure}
+\subsubsection{Level 2:}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{Level2Diagram Automated Time-Table.png}
+    \caption{Level - 2 of the Automated Time-Table DFD}
+    \label{fig:placeholder}
+\end{figure}
+
+
+
+\newpage
+\subsection{Data Dictionary}
+\subsubsection{Level 0:}
+\renewcommand{\arraystretch}{0.8}
+\begin{longtable}{|p{2.7cm}|p{1.2cm}|p{2.5cm}|p{0.7cm}|p{3.0cm}|p{2.5cm}|}
+%\caption{Level 0 Data Dictionary}\label{tag:placeholder}
+\hline
+\textbf{Field Name} & \textbf{Data Type} & \textbf{Data Format} & \textbf{Field Size} & \textbf{Description} & \textbf{Example} \\
+\hline
+\endfirsthead
+\endhead
+
+
+
+\endlastfoot
+Student\_ID & Integer & NNNNNN & 6 & Unique ID for each student & 202301 \\
+\hline
+Student\_Name & Text & — & 50 & Full name of the student & Rahul Mehta \\
+%\hline
+%Faculty\_ID & Integer & NNNNN & 5 & Unique ID assigned to each faculty & 10234 \\
+\hline
+Faculty\_Name & Text & — & 50 & Name of the faculty member & Dr. Sneha Verma \\
+\hline
+Avail.\_Days & Text & Day/Day & 20 & Days faculty is available & Mon/Wed/Fri \\
+\hline
+Avail.\_Time\_Slots & Text & HH:MM-HH:MM & 20 & Time ranges when faculty is available & 10:00-12:00 \\
+\hline
+Subject\_Code & Text & AAA999 & 6 & Unique subject identifier & CSE101 \\
+\hline
+Subject\_Name & Text & — & 50 & Name of the subject & Data Structures \\
+\hline
+Classroom\_ID & Text & ROOM-XXX & 8 & Identifier for the classroom & ROOM-102 \\
+\hline
+Class\_Capacity & Integer & NNN & 3 & Seating capacity of classroom & 60 \\
+\hline
+Exam\_Date & Date & DDMMYYYY & 10 & Scheduled exam date & 25/10/2025 \\
+\hline
+Exam\_Time & Time & HH:MM & 5 & Exam start time & 09:00 \\
+%\hline
+%Time\_Table\_ID & Integer & NNNNN & 5 & Unique identifier for the timetable record & 10045 \\
+\hline
+Day & Text & — & 10 & Day of the week & Monday \\
+\hline
+Time\_Slot & Text & HH:MM-HH:MM & 11 & Time block for class/exam & 10:00-11:00 \\
+\hline
+\caption{Level 0 Data Dictionary}
+\label{tag:placeholder}
+\end{longtable}
+% \caption{Level 0 Data Dictionary}
+% \label{tag:placeholder}
+
+\subsubsection{Level 1}
+\begin{itemize}
+\item Faculty Record
+\begin{longtable}{|p{3cm}|p{2cm}|p{1.5cm}|p{6cm}|}
+\hline
+\textbf{Field} & \textbf{Type} & \textbf{Size} & \textbf{Description} \\
+\hline
+\endfirsthead
+
+\hline
+\textbf{Field} & \textbf{Type} & \textbf{Size} & \textbf{Description} \\
+\hline
+\endhead
+
+\hline
+\endfoot
+
+\hline
+\endlastfoot
+
+Faculty\_ID & Integer & 6 & Unique identifier for faculty \\
+\hline
+Name & Text & 50 & Full name \\
+\hline
+Department & Text & 30 & Faculty's department \\
+\hline
+Available\_Days & Text & 20 & Days available \\
+\hline
+Available\_Slots & Text & 20 & Time slots available \\
+\hline
+\caption{Level 1 Faculty Record}
+\label{tag:placeholder}
+\end{longtable}
+
+
+\item Course Record
+\begin{longtable}{|p{3cm}|p{2cm}|p{1.5cm}|p{6cm}|}
+\hline
+\textbf{Field} & \textbf{Type} & \textbf{Size} & \textbf{Description} \\
+\hline
+\endfirsthead
+
+\hline
+\textbf{Field} & \textbf{Type} & \textbf{Size} & \textbf{Description} \\
+\hline
+\endhead
+
+\hline
+\endfoot
+
+\hline
+\endlastfoot
+
+Course\_Code & Text & 10 & Unique identifier \\
+\hline
+Course\_Name & Text & 50 & Name of the course \\
+\hline
+Semester & Integer & 1 & Semester number \\
+\hline
+Credits & Integer & 1 & Credit value \\
+\hline
+\caption{Level 1 Course Record}
+\label{tag:placeholder}
+\end{longtable}
+
+
+\item Exam Schedule
+\begin{longtable}{|p{3cm}|p{2cm}|p{1.5cm}|p{6cm}|}
+\hline
+\textbf{Field} & \textbf{Type} & \textbf{Size} & \textbf{Description} \\
+\hline
+\endfirsthead
+
+\hline
+\textbf{Field} & \textbf{Type} & \textbf{Size} & \textbf{Description} \\
+\hline
+\endhead
+
+\hline
+\endfoot
+
+\hline
+\endlastfoot
+
+Course\_Code & Text & 10 & Unique identifier \\
+\hline
+Course\_Name & Text & 50 & Name of the course \\
+\hline
+Semester & Integer & 1 & Semester number \\
+\hline
+Credits & Integer & 1 & Credit value \\
+\hline
+\caption{Level 1 Exam Schedule}
+\label{tag:placeholder}
+\end{longtable}
+
+\newpage
+\item {Room Availability Record}
+\begin{longtable}{|p{3cm}|p{2cm}|p{1.5cm}|p{6cm}|}
+\hline
+\textbf{Field} & \textbf{Type} & \textbf{Size} & \textbf{Description} \\
+\hline
+\endfirsthead
+
+\hline
+\textbf{Field} & \textbf{Type} & \textbf{Size} & \textbf{Description} \\
+\hline
+\endhead
+
+\hline
+\endfoot
+
+\hline
+\endlastfoot
+
+Room\_ID & Text & 10 & Unique room/lab identifier \\
+\hline
+Capacity & Integer & 3 & Number of seats \\
+\hline
+Availability & Text & 30 & Days and slots available \\
+\hline
+\caption{Level 1 Room Availability Record}
+\label{tag:placeholder}
+\end{longtable}
+
+\item {Mess Timing Record}
+\begin{longtable}{|p{3cm}|p{2cm}|p{1.5cm}|p{6cm}|}
+\hline
+\textbf{Field} & \textbf{Type} & \textbf{Size} & \textbf{Description} \\
+\hline
+\endfirsthead
+
+\hline
+\textbf{Field} & \textbf{Type} & \textbf{Size} & \textbf{Description} \\
+\hline
+\endhead
+
+\hline
+\endfoot
+
+\hline
+\endlastfoot
+
+Day & Text & 10 & Day of the week \\
+\hline
+Start\_Time & Time & — & Mess open time \\
+\hline
+End\_Time & Time & — & Mess close time \\
+\hline
+\caption{Level 1 Mess Timing Record}
+\label{tag:placeholder}
+\end{longtable}
+
+
+\item {Time-Table Record}
+\begin{longtable}{|p{3cm}|p{2cm}|p{1.5cm}|p{6cm}|}
+\hline
+\textbf{Field} & \textbf{Type} & \textbf{Size} & \textbf{Description} \\
+\hline
+\endfirsthead
+
+\hline
+\textbf{Field} & \textbf{Type} & \textbf{Size} & \textbf{Description} \\
+\hline
+\endhead
+
+\hline
+\endfoot
+
+\hline
+\endlastfoot
+
+TT\_ID & Integer & 6 & Time-table entry ID \\
+\hline
+Faculty\_ID & Integer & 6 & Assigned faculty \\
+\hline
+Course\_Code & Text & 10 & Course scheduled \\
+\hline
+Room\_ID & Text & 10 & Room allocated \\
+\hline
+Day & Text & 10 & Day of the class/exam \\
+\hline
+Time\_Slot & Text & 20 & Start-End time format \\
+\hline
+\caption{Level 1 Time-Table Record}
+\label{tag:placeholder}
+\end{longtable}
+
+\newpage
+\item{Database}
+\begin{longtable}{|p{3cm}|p{2cm}|p{1.5cm}|p{6cm}|}
+\hline
+\textbf{Field} & \textbf{Type} & \textbf{Size} & \textbf{Description} \\
+\hline
+\endfirsthead
+
+\hline
+\textbf{Field} & \textbf{Type} & \textbf{Size} & \textbf{Description} \\
+\hline
+\endhead
+
+\hline
+\endfoot
+
+\hline
+\endlastfoot
+
+TT\_ID & Integer & 6 & Time-table entry ID \\
+\hline
+Faculty\_ID & Integer & 6 & Assigned faculty \\
+\hline
+Course\_Code & Text & 10 & Course scheduled \\
+\hline
+Room\_ID & Text & 10 & Room allocated \\
+\hline
+Day & Text & 10 & Day of the class/exam \\
+\hline
+Time\_Slot & Text & 20 & Start-End time format \\
+\hline
+\caption{Level 1 Database}
+\label{tag:placeholder}
+\end{longtable}
+
+\end{itemize}
+\newpage
+\subsection{Low-Level Design}
+\subsubsection{Data Structures}
+
+The following data structures will be used to represent the key entities in the timetable management system.
+
+\begin{lstlisting}[language=C, caption={Data Structures for the Timetable System}]
+// Represents a student
+struct Student {
+    int studentId;
+    char name[50];
+    char department[30];
+    int semester;
+    int registeredCourses[10]; // course codes
+};
+
+// Represents a faculty member
+struct Faculty {
+    int facultyId;
+    char name[50];
+    char department[30];
+    int availableSlots[20]; // times they are available
+};
+
+// Represents a course
+struct Course {
+    int courseCode;
+    char name[50];
+    int semester;
+    int credits;
+    int facultyId;
+    int expectedEnrollment;
+};
+
+// Represents a classroom/exam hall
+struct Room {
+    int roomId;
+    int capacity;
+    char facilities[100];
+};
+
+// Represents a timetable entry
+struct TimetableEntry {
+    int entryId;
+    int courseCode;
+    int facultyId;
+    int roomId;
+    char day[10];
+    char timeSlot[20];
+    char type[10]; // "class" or "exam"
+};
+// Represents a conflict between timetable entries
+struct ConflictDetail {
+    int entryId1;
+    int entryId2;
+    char reason[100];           // description of conflict
+};
+
+// Represents a saved timetable version (for rollback)
+struct TimetableVersion {
+    char label[30];             // version label
+    char timestamp[25];         // save time
+    int entryIds[200];          // IDs included in snapshot
+    int count;
+};
+\end{lstlisting}
+\newpage
+\subsubsection{Function Declarations}
+
+The following functions will provide the main functionality of the system.
+
+\begin{lstlisting}[language=C, caption={Function Declarations for the Timetable System}]
+// Initialize and load system config
+void initSystem(const char *configPath);
+
+// Free resources and shut down system
+void shutdownSystem();
+
+// Load all input data (students, faculty, courses, rooms)
+void loadInputData();
+
+// Load specific entities
+void loadStudents(const char *path);
+void loadFaculty(const char *path);
+void loadCourses(const char *path);
+void loadRooms(const char *path);
+
+// Generate timetable for a semester (classes)
+TimetableEntry* generateClassTimetable(int semester);
+
+// Generate timetable for selected courses (exams)
+TimetableEntry* generateExamTimetable(int courseCodes[], int count);
+
+// Detect conflicts (student overlap, room clash, faculty double-booking)
+int detectConflicts(TimetableEntry timetable[], int size, struct ConflictDetail conflicts[]);
+
+// Attempt auto-resolution of conflicts
+int autoResolveConflicts(TimetableEntry timetable[], int size);
+
+// Allocate rooms to timetable entries based on capacity
+void allocateRooms(TimetableEntry timetable[], int size, Room rooms[], int roomCount);
+
+// Create personalized timetable for a specific student
+TimetableEntry* buildStudentView(int studentId, TimetableEntry timetable[], int size);
+
+// Create timetable view for a faculty member
+TimetableEntry* buildFacultyView(int facultyId, TimetableEntry timetable[], int size);
+
+// Export timetable to file (PDF/CSV/Image/iCal)
+void exportTimetable(TimetableEntry timetable[], int size, char format[]);
+
+// Save current timetable as a version (for rollback)
+void saveVersion(TimetableEntry timetable[], int size, char label[]);
+
+// Restore a previously saved version
+TimetableEntry* rollbackTo(char label[]);
+
+// Compute metrics (room utilization, student load, faculty load)
+void computeMetrics(TimetableEntry timetable[], int size);
+
+// Set log level for system (0=ERROR,1=INFO,2=DEBUG)
+void setLogLevel(int level);
+\end{lstlisting}
+
+\newpage
+\subsection{Module Structure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{Screenshot 2025-09-16 220848.png}
+    \caption{Module Structure}
+    \label{fig:placeholder}
+\end{figure}
+\newpage
+
+
+
+\section{Coding/Implementation}
+This section outlines the proposed technology stack and implementation strategy for the Automated Timetable Scheduling system. The chosen technologies are selected to meet the functional and non-functional requirements outlined previously, emphasizing performance, scalability, and maintainability.
+\newline
+\newline
+Technology Stack
+\begin{itemize}
+\item Programming Language: Python
+\item Data Handling : CSV files, Pandas, Numpy
+\item IDE/Editor: Visual Studio Code
+\item Frontend: React.js
+
+\item Backend: Python with Django
+
+\item Database: PostgreSQL
+
+\item Core Algorithm: Constraint Satisfaction Programming (CSP) or Genetic Algorithm
+
+\item Deployment: Docker on a cloud platform (AWS/GCP)
+\end{itemize}
+\newpage
+\section{Conclusion}
+% An effective timetable system is fundamental to academic efficiency, particularly in top-tier national institutions where the workload is intense and time management is crucial. While the current timetable technically fulfills its purpose, its manual structure and complexity hinder students from navigating it efficiently. As analyzed, students must constantly cross-reference between slot codes, course listings, classroom allocations, and lab schedules. This fragmentation introduces a high cognitive load and often leads to misinterpretations, especially when electives, minors, or post-midsem courses are involved.\newline
+
+% The slot-based representation used in the existing system, although standardized, requires students to decode codes like A1, L2, or Z-T without direct context. Additionally, the visual clutter in the weekly timetable grid, combined with the absence of personalization, makes it difficult for students to derive a clear, usable schedule. With increasingly flexible academic programs offering a variety of electives and interdisciplinary courses, the current static model no longer scales effectively.\newline
+
+% To address these shortcomings, an automated timetable system has been proposed, focusing on personalization, clarity, and usability. Such a system would generate student-specific schedules based on actual course registrations and dynamically update for changes such as post-midsem classes or lab rescheduling. By integrating all relevant data—course titles, faculty names, room numbers, and session types—into a single interface, the automated system removes the need for manual interpretation.\newline
+
+% Features like real-time conflict detection, exportable views, free-slot identification, and calendar integration would allow students to not only access but also manage their time better. Furthermore, this system would support lab allocations clearly, ensuring students can visualize both theoretical and practical components of their schedule in one consolidated view.\newline
+
+% From an institutional perspective, automation also reduces manual administrative intervention. Faculty, academic staff, and coordinators can benefit from standardized updates, conflict management, and accurate student-wise scheduling. Such a system also aligns with digital infrastructure goals, supporting scalability, accessibility, and secure access for thousands of users.\newline
+
+% The requirements identified—from automated slot mapping to a responsive UI—form the foundation of this transformation. They reflect the student’s need for precision, adaptability, and simplicity in academic planning. The proposed solution is not just a technological upgrade but a strategic tool to support structured learning and improve academic workflows.\newline
+
+% In conclusion, automating the college timetable will significantly enhance user experience, operational efficiency, and academic productivity. It will replace complexity with clarity and serve as a valuable asset in building a more responsive and student-friendly academic environment.
+ 
+
+
+
+
+
+
+
+
+Timetabling is a fundamental aspect of academic institutions, encompassing both the normal everyday class schedules and the examination timetable. In top-tier national colleges, the complexity of these timetables is heightened due to a large student population, diverse courses, multiple departments, and elective choices. This documentation has explored the existing systems for both daily class schedules and examination timetables, highlighting their manual nature, the challenges they present, and the clear need for automation.\newline
+
+The everyday timetable, which dictates when and where classes occur, is traditionally prepared using manual methods such as spreadsheets, paper records, or ad-hoc software. Similarly, the examination timetable is often managed through manual scheduling and allocation processes. Both systems depend heavily on human coordination and data entry, requiring academic staff to balance numerous constraints, including course clashes, room availability, instructor schedules, and student enrollment patterns.\newline
+
+While manual timetabling may have sufficed for smaller or less complex institutions, it struggles to accommodate the dynamic and interconnected nature of modern academic programs. The existing manual systems for both class and exam timetables are prone to errors such as overlapping classes or exams, inefficient use of resources, and difficulties in communication. Students often face confusion when interpreting bulky, generic schedules that lack personalization or guidance. Faculty and administrative staff endure a substantial workload attempting to resolve clashes and update schedules manually, often under tight deadlines.\newline
+
+Moreover, manual processes lack real-time update capabilities, meaning any changes in schedules—whether due to room availability, instructor absence, or unforeseen circumstances—are slow to propagate. This results in misinformation, missed classes or exams, and general dissatisfaction across the campus community. The manual systems also do not provide easy access to critical data, such as optimized room allocations or invigilation duties, which further complicates planning and reduces overall efficiency.\newline
+
+The challenges outlined make a compelling case for the adoption of automated timetabling systems. Automation harnesses advanced algorithms and databases to integrate diverse inputs such as course details, student enrollments, faculty availability, and room capacities. This integrated approach can simultaneously generate conflict-free daily class schedules and examination timetables that respect institutional rules and constraints.\newline
+
+Automated timetabling enhances accuracy and consistency, drastically reducing the likelihood of scheduling conflicts. It also significantly lightens the administrative burden by automating clash detection, room allocation, and notification processes. Students benefit from personalized, accessible schedules with clear venue guidance and timely alerts for any changes. Faculty members receive optimized invigilation assignments aligned with their availability, improving fairness and transparency.\newline
+
+Furthermore, automation enables quick adaptation to unexpected changes, ensuring that updated timetables are instantly shared with all stakeholders. This flexibility is critical in maintaining smooth academic operations and minimizing disruption. The ability to store and analyze historical scheduling data also supports better future planning and resource utilization.\newline
+
+In summary, the current manual methods of managing both normal everyday timetables and examination schedules are inadequate for the scale and complexity of modern top-tier colleges. They introduce inefficiencies, increase the risk of errors, and create communication gaps that impact the academic experience. Transitioning to automated timetabling systems represents a necessary evolution—one that leverages technology to improve operational efficiency, enhance student and staff satisfaction, and support the institution’s commitment to academic excellence.\newline
+
+Implementing such automation requires institutional commitment and collaboration among academic departments, administration, and IT teams. However, the benefits far outweigh the initial effort and investment. As this documentation has demonstrated, the future of timetabling lies in automation, offering a smarter, more reliable, and student-centric approach to academic scheduling.\newline
+
+
+  
+%%%***************************************************************************************  
+%\addcontentsline{toc}{section}{References}
+%\bibliographystyle{numeric}
+\newpage
+% \settocbibname{References}
+% \bibliography{Myreferences}
+\section*{References}
+\begin{enumerate}
+    \item Goktug, A. N., Chai, S. C., & Chen, T. (2013). A timetable organizer for the planning and implementation of screenings in manual or semi-automation mode. Journal of Biomolecular Screening, 18(8), 938–942.
+doi:10.1177/1087057113493720
+
+    \item Shah, M., Patel, K., & Bhatt, C. (2018). Automated timetable generation using genetic algorithm. International Journal of Computer Applications,
+182(18), 1–5. doi:10.5120/ijca2018917461
+\end{enumerate}
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}
