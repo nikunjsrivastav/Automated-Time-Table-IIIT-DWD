@@ -1,287 +1,173 @@
-# Automated Timetable Scheduling System
+# 📘 Automated Timetable + Exam Scheduler + Faculty Timetable Generator  
+### **Complete Python Automation Suite for IIIT Timetables & Exams**
 
-## User Manual for Time-table Automation System
+This repository contains a fully automated system for generating:
 
-### 1. Overview
+✔ **Class Timetables** (with room allocation, elective sync, merging, color coding)  
+✔ **Exam Schedules** (merged across departments, room-based allocation, invigilation)  
+✔ **Faculty-wise Timetables** (per-faculty personalized grids based on generated timetable)
 
-The Time-table Automation System is a command-line Python application designed to automate the scheduling of courses for academic sessions at a university. It processes course data, assigns rooms, schedules lectures, tutorials, and labs while avoiding conflicts (e.g., professor and room conflicts), and accounts for break times (morning and lunch breaks). The system generates timetables for each department-semester combination and outputs them to an Excel file (`timetable_all_departments.xlsx`). It also identifies and reports unscheduled courses in `unscheduled_courses.xlsx` and generates faculty schedules in `all_faculty_timetables.xlsx`.
+It consists of **three major Python modules**:
 
-This manual provides instructions for downloading, setting up, and using the system, along with usage scenarios, requirements satisfied, future work, and FAQs.
+timetable.py → Generates balanced class timetables
+exam.py → Generates student-wise exam schedules with room allocation
+faculty.py → Generates per-faculty timetable sheets
 
----
-
-### 2. Instructions for Downloading the Software from GitHub
-
-#### Accessing the Repository
-
-- Visit the GitHub repository: 'https://github.com/MayankBSahu/Automated-Timetable-scheduling-for-IIIT-Dharwad'
-- If the repository is private, request access from the Software Psych team.
-
-#### Cloning the Repository
-
-- Open a terminal (Command Prompt on Windows, Terminal on macOS/Linux) and run: 
-  ```
-  git clone https://github.com/Darshan7455/Automated-Timetable-.git
-  ```
-
-- This downloads the project files to a `TimeTable` folder on your machine.
-
-#### Downloading as ZIP
-
-- Alternatively, on the GitHub repository page, click the green "Code" button and select "Download ZIP".
-- Extract the ZIP file to a folder on your machine.
+All outputs are exported in **Excel** format with automatic formatting, merging, coloring, and legends.
 
 ---
 
-### 3. How to Set Up the Software
+# 🚀 Features
 
-#### Prerequisites
-
-- **Python 3.9 or later**: Download from [python.org](https://www.python.org/downloads/).
-- **Git**: Download from [git-scm.com](https://git-scm.com/downloads) (optional, for cloning).
-- **pip**: Python's package manager (included with Python).
-
-#### Setup Steps
-
-1. **Navigate to the Project Directory**:
-
-- Open a terminal and navigate to the project folder:
-  ```
-  cd timetable-automation
-  ```
-
-2. **Create a Virtual Environment**:
-
-- Create a virtual environment to manage dependencies:
-  ```
-  python -m venv venv
-  ```
-- Activate the virtual environment:
-  - On Windows:
-    ```
-    venv\Scripts\activate
-    ```
-  - On macOS/Linux:
-    ```
-    source venv/bin/activate
-    ```
-
-3. **Install Dependencies**:
-
-- The system requires the following Python libraries:
-  - `pandas`: Data manipulation and analysis
-  - `openpyxl`: Reading/writing Excel files
-  - `datetime`: Date and time manipulation
-  - `random`: Random number generation
-  - `collections`: Special container datatypes (e.g., defaultdict)
-  - `csv`: CSV file reading/writing
-  - `json`: JSON data manipulation
-  - `os`: Operating system interfaces
-  - `traceback`: Stack trace extraction for error reporting
-
-- Install the main dependencies using:
-  ```
-  pip install pandas openpyxl
-  ```
-- The other packages (`datetime`, `random`, `collections`, `csv`, `json`, `os`, `traceback`) are part of Python's standard library and don't need separate installation.
-
-- Alternatively, if a `requirements.txt` file is provided, run:
-  ```
-  pip install -r requirements.txt
-  ```
-
-4. **Place Configuration Files**:
-
-- Ensure the required input files (`combined.csv` and `rooms.csv`) are in the project directory (see Section 4 for details).
-
-5. **Run the Application**:
-
-- Run the script to generate timetables:
-  ```
-  python main.py
-  ```
-- The script will generate:
-  - `timetable_all_departments.xlsx` - The main timetable file with all department schedules
-  - `unscheduled_courses.xlsx` - Report of courses that couldn't be fully scheduled
-  - `all_faculty_timetables.xlsx` - Individual schedules for all faculty members
-- **Screenshot Placeholder**: [Insert screenshot of the terminal showing the `python TT_gen.py` command and the output messages]
+## ✅ 1. **Balanced Class Timetable Generator (`timetable.py`)**
+- Automatic slot allocation using:
+  - L/T/P hours extracted from L-T-P-S-C  
+  - Faculty availability constraints  
+  - Room capacity matching  
+  - Lab vs. classroom separation  
+  - Break/excluded slots  
+- Multi-section support:
+  - **CSEA I / CSEB I / CSEA III / CSEB III / CSE-V / DSAI / ECE / Semester 7**
+- Elective basket handling with **synchronized elective slots across branches**
+- Auto-coloring and merging of identical adjacent cells
+- Automatically generates legends for each section
+- Produces: Balanced_Timetable_latest.xlsx
 
 ---
 
-### 4. Setting Up Configuration Files
+## ✅ 2. **Exam Scheduler (`exam.py`)**
+- Handles merged departmental exams
+- Constraints enforced:
+  - Max **1 exam per group/day**
+  - Max **4 global exams/day**
+- Room allocation:
+  - Labs, libraries excluded  
+  - Normal rooms used before halls  
+  - Half-capacity seating rule applied  
+- Electives handled semester-wise (morning/afternoon batch logic)
+- Auto invigilator assignment (capacity-based: 1 or 2 invigilators)
+- Exports: final_exam_schedule.xlsx
 
-The system requires two input files to operate: `combined.csv` and `rooms.csv`. These files must be placed in the project directory.
-
-#### Required Configuration Files
-
-1. **combined.csv**:
-
-- **Purpose**: Contains course data for scheduling.
-- **Format** (example):
-  ```
-  Course Code,Course Name,Department,Semester,Faculty,L,T,P,S,C,Schedule,total_students
-  CS301,Software Engineering,CSE,5,Dr. Smith,3,1,0,0,4,Yes,60
-  EC201,Circuits,ECE,3,Dr. Jones,2,1,2,0,4,Yes,45
-  ```
-- **Fields**:
-  - `Course Code`: Unique course identifier (e.g., CS301, or basket courses like B1(CS101/CS102)).
-  - `Course Name`: Name of the course.
-  - `Department`: Department (e.g., CSE, ECE, DSAI).
-  - `Semester`: Semester number (e.g., 1 to 8).
-  - `Faculty`: Instructor name (can include multiple options separated by '/' or multiple instructors).
-  - `L,T,P,S`: Lecture, Tutorial, Practical, Self-study hours (integers).
-  - `C`: Total credits for the course.
-  - `Schedule`: Yes/No, indicating if the course should be scheduled (optional).
-  - `total_students`: Number of students registered for the course (used for room allocation).
-
-2. **rooms.csv**:
-
-- **Purpose**: Contains room data for scheduling.
-- **Format** (example):
-  ```
-  id,roomNumber,type,capacity
-  1,A101,LECTURE_ROOM,60
-  2,Lab1,COMPUTER_LAB,35
-  3,Room201,SEATER_120,120
-  ```
-- **Fields**:
-  - `id`: Unique identifier for the room.
-  - `roomNumber`: Room identifier (e.g., A101, Lab1).
-  - `type`: Room type (LECTURE_ROOM, COMPUTER_LAB, HARDWARE_LAB, SEATER_120, SEATER_240).
-  - `capacity`: Maximum number of students the room can accommodate.
-
-#### Steps to Configure
-
-1. Place `combined.csv` and `rooms.csv` in the project directory (same folder as the script).
-2. Edit the files using Excel or a text editor to match your institution's data.
-
-- **Screenshot Placeholder**: [Insert screenshot of the project directory showing `combined.csv` and `rooms.csv`]
+Includes:
+- Merged exam rows
+- Grid-view day/slot table
+- Course legend
+- Full styling, alignment, alternating color rows
 
 ---
 
-### 5. Usage Scenarios
-
-Since the system is a command-line application, usage involves running the script and viewing the output Excel files.
-
-#### Scenario 1: Generate Timetables for All Departments and Semesters
-
-1. **Prepare Input Files**:
-
-- Ensure `combined.csv` and `rooms.csv` are in the project directory with the correct data.
-- **Screenshot Placeholder**: [Insert screenshot of the project directory with the input files]
-
-2. **Run the Script**:
-
-- Open a terminal, navigate to the project directory, and run:
-  ```
-  python main.py
-  ```
-- The script will:
-  - Read course and room data.
-  - Schedule lectures, tutorials, and labs while avoiding conflicts.
-  - Allocate break times (morning break: 10:30-10:45; lunch break: dynamically staggered between 12:30-14:00).
-  - Generate `timetable_all_departments.xlsx` with separate sheets for each department-semester combination (e.g., `CSE_5`, `ECE_3`).
-- **Screenshot Placeholder**: [Insert screenshot of the terminal showing the script execution and completion message]
-
-3. **View the Timetable**:
-
-- Open `timetable_all_departments.xlsx` in Excel.
-- The "Overview" sheet contains links to all department-semester timetables.
-- Each department-semester sheet shows a timetable with:
-  - Days (Monday to Friday) as rows.
-  - Time slots (9:00 to 18:30, in 30-minute intervals) as columns.
-  - Course details (code, type, faculty, room) in each slot.
-  - A legend at the bottom listing courses, faculty, and LTPS details.
-  - Self-study only courses and unscheduled components (if any).
-- **Screenshot Placeholder**: [Insert screenshot of a timetable sheet in `timetable_all_departments.xlsx`]
-
-4. **Check for Unscheduled Courses**:
-
-- The script generates `unscheduled_courses.xlsx` with details of courses that couldn't be fully scheduled according to their LTPS requirements.
-- Open this file to view details of unscheduled courses (code, name, faculty, required vs. scheduled LTPS hours, and possible reasons).
-- **Screenshot Placeholder**: [Insert screenshot of `unscheduled_courses.xlsx`]
-
-5. **View Faculty Timetables**:
-
-- Open `all_faculty_timetables.xlsx` to view individual schedules for all faculty members.
-- The "Overview" sheet contains links to each faculty member's schedule.
-- Each faculty sheet shows their complete teaching schedule across all departments and courses.
-- **Screenshot Placeholder**: [Insert screenshot of a faculty timetable in `all_faculty_timetables.xlsx`]
+## ✅ 3. **Faculty Timetable Generator (`faculty.py`)**
+- Reads generated timetable and all course CSVs
+- Extracts faculty-wise:
+  - Day  
+  - Slot  
+  - Room  
+  - Course  
+  - Section  
+- Creates a clean **grid timetable for each faculty member**
+- Includes index sheet listing faculty and number of classes
+- Produces: Faculty_Timetable_Grid.xlsx
 
 ---
 
-### 6. Requirements Satisfied by the Current Version
+# 📂 Project Structure
 
-The current version satisfies the following requirements:
-
-- **REQ-02-Config**: The system reads course data and room assignments from `combined.csv` and `rooms.csv`.
-- **REQ-03**: Courses are scheduled in classrooms with sufficient capacity, with students split into sections if needed.
-- **REQ-04-CONFLICTS**: The system distributes course components over the week and avoids scheduling multiple components on the same day.
-- **REQ-05**: Courses with the same code from different departments are scheduled separately.
-- **REQ-06**: Scheduling adheres to the LTPS structure (e.g., 1.5 hours lecture = 3 slots, 2 hours lab = 4 slots, 1 hour tutorial = 2 slots).
-- **REQ-07**: Elective courses are grouped into baskets (B1, B2, etc.) and scheduled to avoid conflicts.
-- **REQ-08**: Lab sessions are allocated based on lab room capacity, with multiple batches if needed.
-- **REQ-09-BREAKS**: Morning break (15 minutes) and inter-class breaks (5 minutes) are included in the schedule.
-- **REQ-10-FACULTY**: The system tries to maintain at least 3 hours between a faculty member's classes on the same day.
-- **REQ-14-VIEW**: Timetables are exported to Excel for viewing by coordinators, faculty, and students.
-- **REQ-18-LUNCH**: Lunch breaks are scheduled in a staggered fashion to avoid overcrowding.
-
----
-
-### 7. Future Work
-
-The following features are planned for future versions:
-
-- **UI Development**: Add a user interface (e.g., Flask web app or Tkinter desktop app) to allow coordinators, faculty, and students to interact with the system directly.
-- **Exam Scheduling (REQ-15-EXAM)**: Implement exam timetable scheduling with seating arrangements and minimize exam days.
-- **Analytics Reports (REQ-16-ANALYTICS)**: Enhance reports on room usage, instructor effort, and student effort.
-- **Faculty Preferences (REQ-11-FACULTY)**: Improve incorporation of faculty scheduling preferences (e.g., preferred days/times).
-- **Reserved Time Slots (REQ-12-COORD)**: Add capability for coordinators to reserve specific time slots.
-- **Google Calendar Integration (REQ-13-GCALENDER)**: Allow faculty and students to sync timetables with Google Calendar.
-- **Dynamic Modifications (REQ-01)**: Enhance support for modifying existing timetables with minimal changes.
-- **Teaching Assistant Allocation (REQ-17-ASSIST)**: Improve allocation of teaching/lab assistants for large courses.
+├── timetable.py
+├── exam.py
+├── faculty.py
+├── data/
+│   ├── rooms.csv
+│   ├── faculty.csv
+│   ├── time_slots.json
+│   └── courses*.csv
+├──docs/
+│   ├── SoftwareSages_DPR.pdf
+│   └── SoftwareSages_DPR.tex
+├── Balanced_Timetable_latest.xlsx 
+├── final_exam_schedule.xlsx 
+└── Faculty_Timetable_Grid_*.xlsx
 
 ---
 
-### 8. FAQs
+# 🧩 How Everything Works
 
-**Q: What should I do if the script fails to run?**
-
-- A: Ensure `combined.csv` and `rooms.csv` are in the project directory with the correct format. Check that all dependencies (`pandas`, `openpyxl`) are installed. Review the terminal error message for details.
-
-**Q: What if some courses are unscheduled?**
-
-- A: The script generates `unscheduled_courses.xlsx` with details of unscheduled courses. You can adjust the input data (e.g., reduce conflicts, add more rooms) and rerun the script.
-
-**Q: Can I customize the time slots or break times?**
-
-- A: Yes, but you'll need to modify the constants in the code (`START_TIME`, `END_TIME`, `LECTURE_DURATION`, etc.). A future version will include a configuration file for these settings.
-
-**Q: How do I view the timetable for a specific department?**
-
-- A: Open `timetable_all_departments.xlsx` in Excel. The "Overview" sheet contains links to each department-semester timetable.
-
-**Q: How can a faculty member view their schedule?**
-
-- A: Open `all_faculty_timetables.xlsx` in Excel. The "Overview" sheet contains links to each faculty member's schedule.
-
-**Q: How does the system handle basket courses (electives)?**
-
-- A: Basket courses (e.g., B1, B2) are scheduled in parallel time slots to avoid conflicts for students who need to choose one course from each basket.
-
-**Q: What happens if a room type is missing in `rooms.csv`?**
-
-- A: The script will print a warning (e.g., "No LECTURE_ROOM type rooms found") and try to continue with available rooms. Ensure all required room types are included in `rooms.csv`.
-
-**Q: How do I add more faculty or courses?**
-
-- A: Simply add new entries to the `combined.csv` file following the same format as existing entries.
+## **Timetable Generation Flow**
+1. Parse time slots + normalize durations  
+2. Load course CSVs and split into first/second semester half  
+3. Allocate L/T/P hours with:
+   - Synchronized elective slots  
+   - Contiguous blocks search  
+   - Excluded slot avoidance  
+4. Allocate rooms:
+   - Capacity-based  
+   - Lab/classroom enforcement  
+   - Same course → same room reuse  
+5. Auto merge identical cells in Excel  
+6. Apply per-course colors  
+7. Add legends & export
 
 ---
 
-### 9. Conclusion
+## **Exam Scheduling Flow**
+1. Read department exam CSVs  
+2. Build elective pools per semester  
+3. Morning/afternoon elective split  
+4. Allocate rooms using:
+   - Best-fit order  
+   - Half-capacity  
+   - Hall-last system  
+5. Schedule regular courses with constraints  
+6. Assign invigilators  
+7. Export formatted Excel
 
-This user manual provides a guide to setting up and using the Time-table Automation System developed by the Software Psych team. The system automates the generation of academic timetables with conflict avoidance, proper room allocation, and staggered break times. It outputs comprehensive timetables for all departments and faculty members in Excel format. Future versions will add more features and enhance scheduling constraints. For support, contact the Software Psych development team.
+---
+
+## **Faculty Timetable Extraction Flow**
+1. Read generated class timetable  
+2. For each entry: extract  
+   - Course code  
+   - Room  
+   - Day  
+   - Slot  
+3. Match with CSV course info to get faculty  
+4. Group by faculty  
+5. Generate individual colored sheets
+
+---
+
+# ⚙️ Installation
+
+### **Requirements**
+1. Python 3.10+
+2. pandas
+3. openpyxl
+
+
+## 🏃 Usage
+
+---
+
+### **1. Generate Class Timetable**
+
+  python timetable.py
+
+Ouput:
+  Balanced_Timetable_latest.xlsx
+
+### **2. Generate Exam Timetable**
+
+  python exam.py
+
+Output:
+  final_exam_schedule.xlsx
+
+
+### **3. Generate Faculty Timetable**
+
+  python faculty.py
+
+Output:
+  Faculty_Timetable_Grid.xlsx
 
 ## Team Members (Software Sages)
 - Nikunj Srivastav (24BCS087)
