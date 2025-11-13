@@ -130,7 +130,7 @@ def create_faculty_timetables(fac_map, slot_order):
         for col in ws.columns:
             ws.column_dimensions[col[0].column_letter].width = 15
 
-    name = f"Faculty_Timetable_Grid_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+    name = f"Faculty_Timetable_Grid.xlsx"
     wb.save(name)
     print("✅ Faculty timetables (grid format) saved as", name)
 

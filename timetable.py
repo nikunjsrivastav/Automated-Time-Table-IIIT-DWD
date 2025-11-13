@@ -5,6 +5,7 @@ import re
 from datetime import datetime
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
+
 random.seed(12345)
 days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
 excluded = ["07:30-09:00", "10:30-10:45", "13:15-14:00", "15:30-15:40"]
@@ -187,7 +188,7 @@ def alloc(tt, busy, rm, d, f, code, h, typ="L", elec=False, labsd=set(), ex=Fals
             if total + 1e-9 >= h:
                 if alloc_specific(tt, busy, rm, pref_day, pref_slots, f, code, typ, elec, labsd):
                     return True
-                    
+                        
     for blk in free(tt, d, ex):
         if sum(slot_dur[s] for s in blk) + 1e-9 < h:
             continue
@@ -414,6 +415,7 @@ def add_csv_legend_block(ws, csv_path, legend_title):
 
     ws.append([""])
 
+
 def generate(courses, ws, label, seed, elective_sync):
     if valid(courses):
         return []
@@ -430,93 +432,113 @@ def generate(courses, ws, label, seed, elective_sync):
     elec = [x for x in courses if s(x.get("Elective", "")) == "1"]
     non = [x for x in courses if s(x.get("Elective", "")) != "1"]
 
-    for e in elec:
-        sync_n = s(e.get("Course_Title", "")) or s(e.get("Course_Code", ""))
-        e["_sync_name"] = sync_n
-
     baskets = {}
+    elec_no_baskets = []
     for e in elec:
         b = s(e.get("ElectiveBasket", "0"))
-        if b == "0" or b == "":
-            non.append(e)
-            continue
-        baskets.setdefault(b, []).append(e)
+        if b and b != "0":
+            baskets.setdefault(b, []).append(e)
+        else:
+            elec_no_baskets.append(e)
 
+    basket_reps = []
     for b, group in sorted(baskets.items(), key=lambda x: int(x[0]) if x[0].isdigit() else 0):
         chosen = group[0]
-        sync_n = s(chosen.get("Course_Title", "")) or s(chosen.get("Course_Code", ""))
-        non.append({
+        sync_identifier = f"BASKET_{b}"
+        basket_reps.append({
             "Course_Code": f"Elective{b}",
-            "Course_Title": chosen.get("Course_Title", ""),
+            "Course_Title": chosen.get("Course_Title", "") or chosen.get("Course_Code", ""),
             "Faculty": chosen.get("Faculty", ""),
             "L-T-P-S-C": chosen.get("L-T-P-S-C", "0-0-0-0-0"),
             "Elective": "1",
             "ElectiveBasket": b,
-            "_sync_name": sync_n
+            "_sync_name": sync_identifier
         })
 
-    start_idx = seed % len(days)
+    for e in elec_no_baskets:
+        sync_n = s(e.get("Course_Title", "")) or s(e.get("Course_Code", ""))
+        e["_sync_name"] = sync_n if sync_n else None
 
-    for c in non:
-        f = s(c.get("Faculty", ""))
-        code = s(c.get("Course_Code", "UNKNOWN"))
-        ele = (code.startswith("Elective"))
-        L, T, P, S, C = ltp(c.get("L-T-P-S-C", "0-0-0-0-0"))
-        for h, typ in [(L, "L"), (T, "T"), (P, "P")]:
-            attempts = 0
-            while h > 1e-9 and attempts < 150:
-                a = 2.0 if (typ == "P" and h >= 2) else (1.5 if h >= 1.5 else 1.0)
-                placed = False
-                if typ == "P":
-                    d_order = ["Tuesday", "Wednesday", "Thursday", "Monday", "Friday"]
-                else:
-                    d_order = days[start_idx:] + days[:start_idx]
-                start_idx = (start_idx + 1) % len(days)
+    elec_final = elec_no_baskets + basket_reps
 
-                sync_name = c.get("_sync_name", None)
-                if sync_name and sync_name in elective_sync:
-                    pref = elective_sync[sync_name]
-                    if alloc(tt, busy, rm, pref["day"], f, code, a, typ, ele, labsd, False, preferred_slots=(pref["day"], pref["slots"])):
-                        h -= a
-                        placed = True
+    def place_course_list(course_list, start_idx_ref):
+        placed_list = []
+        for c in course_list:
+            f = s(c.get("Faculty", ""))
+            code = s(c.get("Course_Code", "UNKNOWN"))
+            ele = (code.startswith("Elective") or s(c.get("Elective", "")) == "1")
+            L, T, P, S, C = ltp(c.get("L-T-P-S-C", "0-0-0-0-0"))
 
-                if not placed:
-                    for d in d_order:
-                        if alloc(tt, busy, rm, d, f, code, a, typ, ele, labsd, False):
+            for h, typ in [(L, "L"), (T, "T"), (P, "P")]:
+                attempts = 0
+                while h > 1e-9 and attempts < 300:
+                    if typ == "P":
+                        a = 2.0 if h >= 2 else (1.5 if h >= 1.5 else 1.0)
+                    else:
+                        a = 1.5 if h >= 1.5 else 1.0
+
+                    placed = False
+
+                    sync_name = c.get("_sync_name", None)
+                    if sync_name and sync_name in elective_sync:
+                        pref = elective_sync[sync_name]
+                        if alloc(tt, busy, rm, pref["day"], f, code, a, typ, ele, labsd, False, preferred_slots=(pref["day"], pref["slots"])):
                             h -= a
                             placed = True
-                            break
 
-                if not placed:
-                    for d in d_order:
-                        if alloc(tt, busy, rm, d, f, code, a, typ, ele, labsd, True):
-                            h -= a
-                            placed = True
-                            break
+                    if not placed:
+                        if ele:
+                            d_order = days[:]
+                        else:
+                            start_idx = start_idx_ref[0]
+                            d_order = days[start_idx:] + days[:start_idx]
+                            start_idx_ref[0] = (start_idx_ref[0] + 1) % len(days)
 
-                if placed and sync_name and sync_name not in elective_sync:
-                    for dcheck in days:
-                        slots_used = [s_ for s_ in slot_keys if tt.at[dcheck, s_].startswith(code)]
-                        if slots_used:
-                            accum = []
-                            acc_dur = 0.0
-                            for s_ in slots_used:
-                                accum.append(s_)
-                                acc_dur += slot_dur[s_]
-                                if acc_dur + 1e-9 >= a:
-                                    elective_sync[sync_name] = {"day": dcheck, "slots": accum.copy()}
-                                    break
-                            if sync_name in elective_sync:
+                        for d in d_order:
+                            if alloc(tt, busy, rm, d, f, code, a, typ, ele, labsd, False):
+                                h -= a
+                                placed = True
                                 break
 
-                attempts += 1
+                    if not placed:
+                        for d in days:
+                            if alloc(tt, busy, rm, d, f, code, a, typ, ele, labsd, True):
+                                h -= a
+                                placed = True
+                                break
+
+                    if placed and sync_name and sync_name not in elective_sync:
+                        for dcheck in days:
+                            slots_used = [s_ for s_ in slot_keys if tt.at[dcheck, s_].startswith(code)]
+                            if slots_used:
+                                accum = []
+                                acc_dur = 0.0
+                                for s_ in slots_used:
+                                    accum.append(s_)
+                                    acc_dur += slot_dur[s_]
+                                    if acc_dur + 1e-9 >= a:
+                                        elective_sync[sync_name] = {"day": dcheck, "slots": accum.copy()}
+                                        break
+                                if sync_name in elective_sync:
+                                    break
+                    attempts += 1
+            placed_list.append(c)
+        return placed_list
+
+    start_idx_ref = [seed % len(days)]
+
+    elec_placed = place_course_list(elec_final, start_idx_ref)
+    non_placed = place_course_list(non, start_idx_ref)
+
+    combined = non_placed + elec_placed
 
     ws.append(["Day"] + slot_keys)
     for d in days:
         ws.append([d] + [tt.at[d, s] for s in slot_keys])
     ws.append([""])
 
-    return non + elec
+    return combined
+
 
 def split(c):
     f = [x for x in c if s(x.get("Semester_Half", "")) in ["1", "0"]]
@@ -530,75 +552,77 @@ if __name__ == "__main__":
 
     ws1 = wb.active
     ws1.title = "CSE-I Timetable"
-    sync_I = {}
+    sync_I_sem = {}
 
     cAf, cAs = split(coursesAI)
     cBf, cBs = split(coursesBI)
 
-    csea_block = generate(cAf, ws1, "CSEA I First Half", seed + 0, sync_I)
-    csea_block2 = generate(cAs, ws1, "CSEA I Second Half", seed + 1, sync_I)
-    add_csv_legend_block(ws1, "coursesCSEA-I.csv", "CSEA I")
+    csea_block = generate(cAf, ws1, "CSEA I First Half", seed + 0, sync_I_sem)
+    csea_block2 = generate(cAs, ws1, "CSEA I Second Half", seed + 1, sync_I_sem)
+    add_csv_legend_block(ws1, "data/coursesCSEA-I.csv", "CSEA I")
 
-    cseb_block = generate(cBf, ws1, "CSEB I First Half", seed + 2, sync_I)
-    cseb_block2 = generate(cBs, ws1, "CSEB I Second Half", seed + 3, sync_I)
-    add_csv_legend_block(ws1, "coursesCSEB-I.csv", "CSEB I")
+    cseb_block = generate(cBf, ws1, "CSEB I First Half", seed + 2, sync_I_sem)
+    cseb_block2 = generate(cBs, ws1, "CSEB I Second Half", seed + 3, sync_I_sem)
+    add_csv_legend_block(ws1, "data/coursesCSEB-I.csv", "CSEB I")
 
     combined_i_courses = (csea_block or []) + (csea_block2 or []) + (cseb_block or []) + (cseb_block2 or [])
     merge_and_color(ws1, combined_i_courses)
 
-    ws2 = wb.create_sheet("CSE-III Timetable")
-    sync_III = {}
+    sync_III_sem = {}
 
+    ws2 = wb.create_sheet("CSE-III Timetable")
     c1f, c1s = split(coursesA)
     c2f, c2s = split(coursesB)
 
-    csea3_block1 = generate(c1f, ws2, "CSEA III First Half", seed + 4, sync_III)
-    csea3_block2 = generate(c1s, ws2, "CSEA III Second Half", seed + 5, sync_III)
-    add_csv_legend_block(ws2, "coursesCSEA-III.csv", "CSEA III")
+    csea3_block1 = generate(c1f, ws2, "CSEA III First Half", seed + 4, sync_III_sem)
+    csea3_block2 = generate(c1s, ws2, "CSEA III Second Half", seed + 5, sync_III_sem)
+    add_csv_legend_block(ws2, "data/coursesCSEA-III.csv", "CSEA III")
 
-    cseb3_block1 = generate(c2f, ws2, "CSEB III First Half", seed + 6, sync_III)
-    cseb3_block2 = generate(c2s, ws2, "CSEB III Second Half", seed + 7, sync_III)
-    add_csv_legend_block(ws2, "coursesCSEB-III.csv", "CSEB III")
+    cseb3_block1 = generate(c2f, ws2, "CSEB III First Half", seed + 6, sync_III_sem)
+    cseb3_block2 = generate(c2s, ws2, "CSEB III Second Half", seed + 7, sync_III_sem)
+    add_csv_legend_block(ws2, "data/coursesCSEB-III.csv", "CSEB III")
 
     combined_iii_courses = (csea3_block1 or []) + (csea3_block2 or []) + (cseb3_block1 or []) + (cseb3_block2 or [])
     merge_and_color(ws2, combined_iii_courses)
 
-    ws3 = wb.create_sheet("CSE-V Timetable")
-    c5f, c5s = split(coursesV)
-
-    c5_block1 = generate(c5f, ws3, "CSE-V First Half", seed + 8, {})
-    c5_block2 = generate(c5s, ws3, "CSE-V Second Half", seed + 9, {})
-    add_csv_legend_block(ws3, "coursesCSE-V.csv", "CSE V")
-
-    combined_v_courses = (c5_block1 or []) + (c5_block2 or [])
-    merge_and_color(ws3, combined_v_courses)
-
-    ws4 = wb.create_sheet("DSAI Timetable")
+    ws4 = wb.create_sheet("DSAI-III Timetable")
     d1f, d1s = split(coursesDSAI)
 
-    dsa_block1 = generate(d1f, ws4, "DSAI-III First Half", seed + 10, {})
-    dsa_block2 = generate(d1s, ws4, "DSAI=III Second Half", seed + 11, {})
-    add_csv_legend_block(ws4, "coursesDSAI-III.csv", "DSAI")
+    dsa_block1 = generate(d1f, ws4, "DSAI-III First Half", seed + 10, sync_III_sem)
+    dsa_block2 = generate(d1s, ws4, "DSAI=III Second Half", seed + 11, sync_III_sem)
+    add_csv_legend_block(ws4, "data/coursesDSAI-III.csv", "DSAI")
 
     combined_dsa_courses = (dsa_block1 or []) + (dsa_block2 or [])
     merge_and_color(ws4, combined_dsa_courses)
 
-    ws5 = wb.create_sheet("ECE Timetable")
+    ws5 = wb.create_sheet("ECE-III Timetable")
     e1f, e1s = split(coursesECE)
 
-    ece_block1 = generate(e1f, ws5, "ECE First Half", seed + 12, {})
-    ece_block2 = generate(e1s, ws5, "ECE Second Half", seed + 13, {})
-    add_csv_legend_block(ws5, "coursesECE-III.csv", "ECE")
+    ece_block1 = generate(e1f, ws5, "ECE-III First Half", seed + 12, sync_III_sem)
+    ece_block2 = generate(e1s, ws5, "ECE-III Second Half", seed + 13, sync_III_sem)
+    add_csv_legend_block(ws5, "data/coursesECE-III.csv", "ECE")
 
     combined_ece_courses = (ece_block1 or []) + (ece_block2 or [])
     merge_and_color(ws5, combined_ece_courses)
+
+    sync_V_sem = {}
+
+    ws3 = wb.create_sheet("CSE-V Timetable")
+    c5f, c5s = split(coursesV)
+
+    c5_block1 = generate(c5f, ws3, "CSE-V First Half", seed + 8, sync_V_sem)
+    c5_block2 = generate(c5s, ws3, "CSE-V Second Half", seed + 9, sync_V_sem)
+    add_csv_legend_block(ws3, "data/coursesCSE-V.csv", "CSE V")
+
+    combined_v_courses = (c5_block1 or []) + (c5_block2 or [])
+    merge_and_color(ws3, combined_v_courses)
 
     ws6 = wb.create_sheet("DSAI 7TH-SEM Timetable")
     s7f, s7s = split(coursesVII)
 
     s7_block1 = generate(s7f, ws6, "DSAI 7TH-SEM First Half", seed + 14, {})
     s7_block2 = generate(s7s, ws6, "DSAI 7TH-SEM Second Half", seed + 15, {})
-    add_csv_legend_block(ws6, "courses7.csv", "7TH SEM")
+    add_csv_legend_block(ws6, "data/courses7.csv", "7TH SEM")
 
     combined_7_courses = (s7_block1 or []) + (s7_block2 or [])
     merge_and_color(ws6, combined_7_courses)
@@ -607,7 +631,7 @@ if __name__ == "__main__":
     d1f_i, d1s_i = split(coursesDSAI_I) 
     dsai1_block1 = generate(d1f_i, ws7, "DSAI-I First Half", seed + 16, {})
     dsai1_block2 = generate(d1s_i, ws7, "DSAI-I Second Half", seed + 17, {})
-    add_csv_legend_block(ws7, "coursesDSAI-I.csv", "DSAI I")
+    add_csv_legend_block(ws7, "data/coursesDSAI-I.csv", "DSAI I")
 
     combined_dsai1_courses = (dsai1_block1 or []) + (dsai1_block2 or [])
     merge_and_color(ws7, combined_dsai1_courses)
@@ -615,9 +639,9 @@ if __name__ == "__main__":
     ws8 = wb.create_sheet("DSAI-V Timetable")
     d5f_v, d5s_v = split(coursesDSAI_V) 
 
-    dsai5_block1 = generate(d5f_v, ws8, "DSAI-V First Half", seed + 18, {})
-    dsai5_block2 = generate(d5s_v, ws8, "DSAI-V Second Half", seed + 19, {})
-    add_csv_legend_block(ws8, "coursesDSAI-V.csv", "DSAI V")
+    dsai5_block1 = generate(d5f_v, ws8, "DSAI-V First Half", seed + 18, sync_V_sem)
+    dsai5_block2 = generate(d5s_v, ws8, "DSAI-V Second Half", seed + 19, sync_V_sem)
+    add_csv_legend_block(ws8, "data/coursesDSAI-V.csv", "DSAI V")
 
     combined_dsai5_courses = (dsai5_block1 or []) + (dsai5_block2 or [])
     merge_and_color(ws8, combined_dsai5_courses)
@@ -627,7 +651,7 @@ if __name__ == "__main__":
 
     ece1_block1 = generate(e1f_i, ws9, "ECE-I First Half", seed + 20, {})
     ece1_block2 = generate(e1s_i, ws9, "ECE-I Second Half", seed + 21, {})
-    add_csv_legend_block(ws9, "coursesECE-I.csv", "ECE I")
+    add_csv_legend_block(ws9, "data/coursesECE-I.csv", "ECE I")
 
     combined_ece1_courses = (ece1_block1 or []) + (ece1_block2 or [])
     merge_and_color(ws9, combined_ece1_courses)
@@ -635,12 +659,13 @@ if __name__ == "__main__":
     ws10 = wb.create_sheet("ECE-V Timetable")
     e5f_v, e5s_v = split(coursesECE_V) 
 
-    ece5_block1 = generate(e5f_v, ws10, "ECE-V First Half", seed + 22, {})
-    ece5_block2 = generate(e5s_v, ws10, "ECE-V Second Half", seed + 23, {})
-    add_csv_legend_block(ws10, "coursesECE-V.csv", "ECE V")
+    ece5_block1 = generate(e5f_v, ws10, "ECE-V First Half", seed + 22, sync_V_sem)
+    ece5_block2 = generate(e5s_v, ws10, "ECE-V Second Half", seed + 23, sync_V_sem)
+    add_csv_legend_block(ws10, "data/coursesECE-V.csv", "ECE V")
 
     combined_ece5_courses = (ece5_block1 or []) + (ece5_block2 or [])
     merge_and_color(ws10, combined_ece5_courses)
+    
     name = f"Balanced_Timetable_latest.xlsx"
     wb.save(name)
     print("✅ Evenly balanced timetable saved in", name)
