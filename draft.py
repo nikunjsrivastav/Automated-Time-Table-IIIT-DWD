@@ -1,7 +1,3 @@
-# Balanced Timetable Generator with per-course-per-day rule enforcement
-# (Modified to ensure at most one L, T, and P per course per day)
-# Original author: (user)
-# Modifications: course-usage tracking added and passed into alloc/alloc_specific
 
 import pandas as pd
 import json
@@ -144,10 +140,6 @@ def free(tt, d, ex=False):
     return fb
 
 def alloc_specific(tt, busy, rm, day, slots_to_use, f, code, typ, elec, labsd, course_usage):
-    """
-    Allocates exactly the provided slots_to_use on the given day for the course.
-    This version enforces the per-course-per-day rule via course_usage dict.
-    """
     # Validate slots and free-ness
     for s_ in slots_to_use:
         if s_ not in slot_keys or tt.at[day, s_] != "":
