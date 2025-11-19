@@ -1,7 +1,6 @@
 Room_ID,Capacity,Type,Facilities
 C101,48,Classroom,"Whiteboard, Display Screen"
 C102,48,Classroom,"Whiteboard, Display Screen"
-C103,-,Library,"Books, Desks"
 C104,48,Classroom,"Whiteboard, Display Screen"
 L105,48,Lab,"Hardware, Whiteboard"
 L106,48,Lab,"Computers, Whiteboard"
