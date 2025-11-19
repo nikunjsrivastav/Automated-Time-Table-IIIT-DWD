@@ -6,7 +6,7 @@ import time
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
 
-random.seed(int(time.time()))
+random.seed(42)
 
 days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
 excluded = ["07:30-09:00", "10:30-10:45", "13:15-14:00", "15:30-15:40"]
