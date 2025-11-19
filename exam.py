@@ -4,8 +4,8 @@ import pandas as pd
 from collections import defaultdict, deque
 from datetime import datetime, timedelta
 from openpyxl import load_workbook
-from openpyxl.styles import Alignment, Border, Side, PatternFill, Font
-from openpyxl.cell.cell import MergedCell
+from openpyxl.styles import Alignment, Border, Side, PatternFill, Font, Color
+from openpyxl.utils import get_column_letter
 
 # ---- Config ----
 SLOT_LABELS = ["09:00-12:00", "14:00-17:00"]
@@ -58,9 +58,7 @@ class ExamScheduler:
         self.invig_assignments = []
         self._inv_idx = 0
 
-        # Build student pools from students.csv (Option B: Courses semicolon-separated)
-        # pools_course[(group, course)] -> deque(student_ids)
-        # group_pool[group] -> deque(student_ids) fallback
+        # Build student pools
         self.pools_course = defaultdict(deque)
         self.group_pool = defaultdict(deque)
         for _, r in self.students_df.iterrows():
@@ -72,7 +70,6 @@ class ExamScheduler:
             courses = [c.strip() for c in courses_raw.split(";") if c.strip()]
             for c in courses:
                 self.pools_course[(grp, c)].append(sid)
-            # Also put in group fallback
             self.group_pool[grp].append(sid)
 
     def _load_rooms(self):
@@ -293,10 +290,8 @@ class ExamScheduler:
                                                    "Exam": " | ".join(sorted(set(exam_names))),
                                                    "Invigilators": ", ".join(picks)})
 
-    # Seating assignment: use pools_course[(group, course)] first, then group fallback
     def _assign_students_to_room_alloc(self):
         assigned = defaultdict(list)
-        # shallow copies of deques so function doesn't exhaust original pools in scheduler object
         pools_course = {k: deque(v) for k, v in self.pools_course.items()}
         group_pool = {k: deque(v) for k, v in self.group_pool.items()}
 
@@ -307,10 +302,8 @@ class ExamScheduler:
             groups = [g.strip() for g in str(rec.get("Groups", "")).split(",") if g.strip()]
             parts = [p.strip() for p in str(rec.get("Allocations", "")).split(";") if p.strip()]
 
-            # prepare round-robin group queue
             grp_queue = deque([g for g in groups if (g, code) in pools_course or g in group_pool])
             if not grp_queue:
-                # fallback: if no group-specific pools, take any group in scheduler groups
                 grp_queue = deque([g for g in groups])
 
             for part in parts:
@@ -321,7 +314,6 @@ class ExamScheduler:
                 needed = int(cnts.strip())
                 picks = []
                 while needed > 0 and any((pools_course.get((g, code)) and pools_course[(g, code)]) or (group_pool.get(g) and group_pool[g]) for g in groups):
-                    # cycle groups to find available student
                     chosen = None
                     for _ in range(len(grp_queue)):
                         g = grp_queue[0]
@@ -341,14 +333,14 @@ class ExamScheduler:
                         sid = group_pool[g].popleft()
                     picks.append(sid)
                     needed -= 1
-                # if still needed, try any other course-specific pools
+                
                 other_keys = [k for k in pools_course.keys() if k[1] == code and pools_course[k]]
                 while needed > 0 and other_keys:
                     k = other_keys.pop(0)
                     sid = pools_course[k].popleft()
                     picks.append(sid)
                     needed -= 1
-                # placeholders as empty strings (so Excel cell blank)
+                
                 while needed > 0:
                     picks.append("")
                     needed -= 1
@@ -357,10 +349,8 @@ class ExamScheduler:
         return assigned
 
     def _place_in_room_grid(self, student_list):
-        # student_list: list of (student_id, exam_code)
         SEAT_COLS = 8
         SEAT_ROWS = 6
-        # bucket by (year, branch) for mixing
         buckets = defaultdict(list)
         for sid, code in student_list:
             s = sid or ""
@@ -369,16 +359,13 @@ class ExamScheduler:
             buckets[(year, branch)].append((sid, code))
         deques = [deque(v) for v in buckets.values()] if buckets else []
         interleaved = []
-        # round-robin across buckets
         while any(deques):
             for q in deques:
                 if q:
                     interleaved.append(q.popleft())
-        # ensure length exactly 48 (pad with empty)
         while len(interleaved) < SEAT_COLS * SEAT_ROWS:
             interleaved.append(("", ""))
         interleaved = interleaved[:SEAT_COLS * SEAT_ROWS]
-        # build grid rows: 6 rows × 8 cols
         grid = []
         idx = 0
         for r in range(SEAT_ROWS):
@@ -427,167 +414,253 @@ class ExamScheduler:
                 grid.at[d, s] = ", ".join(subset["Course_Code"].tolist()) if not subset.empty else ""
         return grid
 
+    # ---------------------------------------------------------
+    #  STYLING HELPER
+    # ---------------------------------------------------------
+    def _format_table(self, ws, start_row, start_col, df, title=None):
+        """Applies professional styling to a table region."""
+        
+        # Color Palette
+        HEADER_FILL = PatternFill(start_color="1F497D", end_color="1F497D", fill_type="solid") # Dark Blue
+        HEADER_FONT = Font(name="Calibri", size=12, bold=True, color="FFFFFF") # White Text
+        
+        ROW_FILL_EVEN = PatternFill(start_color="DCE6F1", end_color="DCE6F1", fill_type="solid") # Light Blue
+        ROW_FILL_ODD = PatternFill(start_color="FFFFFF", end_color="FFFFFF", fill_type="solid")  # White
+        
+        BORDER_THIN = Side(style="thin", color="A6A6A6")
+        BORDER_MED = Side(style="medium", color="000000")
+        border_all = Border(left=BORDER_THIN, right=BORDER_THIN, top=BORDER_THIN, bottom=BORDER_THIN)
+        
+        rows = len(df)
+        cols = len(df.columns)
+        end_row = start_row + rows
+        end_col = start_col + cols - 1
+
+        current_row = start_row
+        # 1. Optional Title
+        if title:
+            ws.merge_cells(start_row=current_row, start_column=start_col, end_row=current_row, end_column=end_col)
+            cell = ws.cell(row=current_row, column=start_col, value=title)
+            cell.font = Font(name="Calibri", size=14, bold=True, color="1F497D")
+            cell.alignment = Alignment(horizontal="left")
+            current_row += 1
+            end_row += 1
+
+        # 2. Header Row
+        for c_idx, col_name in enumerate(df.columns):
+            cell = ws.cell(row=current_row, column=start_col + c_idx, value=col_name)
+            cell.fill = HEADER_FILL
+            cell.font = HEADER_FONT
+            cell.alignment = Alignment(horizontal="center", vertical="center")
+            cell.border = border_all
+
+        # 3. Data Rows (Zebra Striping)
+        for r_idx in range(rows):
+            row_num = current_row + 1 + r_idx
+            fill = ROW_FILL_EVEN if r_idx % 2 == 0 else ROW_FILL_ODD
+            for c_idx in range(cols):
+                cell = ws.cell(row=row_num, column=start_col + c_idx)
+                cell.fill = fill
+                cell.border = border_all
+                cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+
+        # 4. Thick Outline
+        # Top
+        for c in range(start_col, end_col + 1):
+            ws.cell(row=current_row, column=c).border = Border(top=BORDER_MED, left=BORDER_THIN, right=BORDER_THIN, bottom=BORDER_THIN)
+        # Bottom
+        for c in range(start_col, end_col + 1):
+            ws.cell(row=end_row, column=c).border = Border(bottom=BORDER_MED, left=BORDER_THIN, right=BORDER_THIN, top=BORDER_THIN)
+        # Left
+        for r in range(current_row, end_row + 1):
+            old = ws.cell(row=r, column=start_col).border
+            ws.cell(row=r, column=start_col).border = Border(left=BORDER_MED, right=old.right, top=old.top, bottom=old.bottom)
+        # Right
+        for r in range(current_row, end_row + 1):
+            old = ws.cell(row=r, column=end_col).border
+            ws.cell(row=r, column=end_col).border = Border(right=BORDER_MED, left=old.left, top=old.top, bottom=old.bottom)
+
+        return end_row + 2 
+
     def export(self, out="final_exam_schedule_with_seating.xlsx"):
         merged_df, legend_df = self._build_merged()
         grid_df = self._build_grid(merged_df)
+        
+        invig_rows = []
+        for rec in self.invig_assignments:
+            date = rec["Date"]; slot = rec["Slot"]; room = rec["Room_ID"]
+            invs = [x.strip() for x in rec["Invigilators"].split(",") if x.strip()]
+            exam = rec.get("Exam", "")
+            for inv in invs:
+                invig_rows.append({"Date": date, "Slot": slot, "Room_ID": room, "Exam": exam, "Invigilator": inv})
+        invig_df = pd.DataFrame(invig_rows)
 
         room_student_map = self._assign_students_to_room_alloc()
         room_grids = {}
+        summary = []
         for (rid, date, slot), students in room_student_map.items():
             grid = self._place_in_room_grid(students)
             room_grids[(rid, date, slot)] = grid
+            count = sum(1 for row in grid for v in row if v)
+            summary.append({"Room_ID": rid, "Date": date, "Slot": slot, "Placed": count})
+        summary_df = pd.DataFrame(summary)
 
         with pd.ExcelWriter(out, engine="openpyxl") as writer:
-            merged_df.to_excel(writer, sheet_name="Exam Schedule", index=False, startrow=1)
-            grid_df.to_excel(writer, sheet_name="Exam Schedule", startrow= len(merged_df) + 6)
-            legend_df.to_excel(writer, sheet_name="Exam Schedule", index=False, startrow= len(merged_df) + len(grid_df) + 10)
-
-            # invigilators sheet
-            invig_rows = []
-            for rec in self.invig_assignments:
-                date = rec["Date"]; slot = rec["Slot"]; room = rec["Room_ID"]
-                invs = [x.strip() for x in rec["Invigilators"].split(",") if x.strip()]
-                exam = rec.get("Exam", "")
-                for inv in invs:
-                    invig_rows.append({"Date": date, "Slot": slot, "Room_ID": room, "Exam": exam, "Invigilator": inv})
-            if invig_rows:
-                pd.DataFrame(invig_rows).to_excel(writer, sheet_name="Invigilators", index=False)
-
-            # seating summary
-            summary = []
-            for key, grid in room_grids.items():
-                rid, date, slot = key
-                count = sum(1 for row in grid for v in row if v)
-                summary.append({"Room_ID": rid, "Date": date, "Slot": slot, "Placed": count})
-            if summary:
-                pd.DataFrame(summary).to_excel(writer, sheet_name="Seating Plans Summary", index=False)
+            pd.DataFrame().to_excel(writer, sheet_name="Exam Schedule")
+            if not invig_df.empty:
+                invig_df.to_excel(writer, sheet_name="Invigilators", index=False)
+            if not summary_df.empty:
+                summary_df.to_excel(writer, sheet_name="Summary", index=False)
 
         wb = load_workbook(out)
-        thin = Border(left=Side(style="thin"), right=Side(style="thin"), top=Side(style="thin"), bottom=Side(style="thin"))
-        thick = Border(left=Side(style="medium"), right=Side(style="medium"), top=Side(style="medium"), bottom=Side(style="medium"))
-        gray = PatternFill(start_color="D3D3D3", end_color="D3D3D3", fill_type="solid")
-        pale_blue = PatternFill(start_color="E3F2FD", end_color="E3F2FD", fill_type="solid")
-        pale_pink = PatternFill(start_color="FCE4EC", end_color="FCE4EC", fill_type="solid")
+        
+        # 1. Exam Schedule Sheet
+        ws_main = wb["Exam Schedule"]
+        curr_row = 1
+        for row in ws_main.iter_rows():
+            for cell in row: cell.value = None
+            
+        # Table A: Master
+        rows_to_write = [merged_df.columns.tolist()] + merged_df.values.tolist()
+        for r_idx, row_data in enumerate(rows_to_write):
+            for c_idx, val in enumerate(row_data):
+                ws_main.cell(row=curr_row + 1 + r_idx, column=1 + c_idx, value=val)
+        curr_row = self._format_table(ws_main, curr_row, 1, merged_df, title="MASTER EXAM SCHEDULE")
+        
+        # Table B: Slot Grid
+        grid_df_reset = grid_df.reset_index().rename(columns={'index':'Date'})
+        rows_to_write = [grid_df_reset.columns.tolist()] + grid_df_reset.values.tolist()
+        start_r = curr_row
+        for r_idx, row_data in enumerate(rows_to_write):
+            for c_idx, val in enumerate(row_data):
+                ws_main.cell(row=start_r + 1 + r_idx, column=1 + c_idx, value=val)
+        curr_row = self._format_table(ws_main, curr_row, 1, grid_df_reset, title="SLOT VIEW")
 
-        # create one seating sheet per date
+        # Table C: Legend
+        rows_to_write = [legend_df.columns.tolist()] + legend_df.values.tolist()
+        start_r = curr_row
+        for r_idx, row_data in enumerate(rows_to_write):
+            for c_idx, val in enumerate(row_data):
+                ws_main.cell(row=start_r + 1 + r_idx, column=1 + c_idx, value=val)
+        self._format_table(ws_main, curr_row, 1, legend_df, title="COURSE LEGEND")
+
+        # 2. Invigilators
+        if "Invigilators" in wb.sheetnames:
+            self._format_table(wb["Invigilators"], 1, 1, invig_df)
+
+        # 3. Summary
+        if "Summary" in wb.sheetnames:
+            self._format_table(wb["Summary"], 1, 1, summary_df)
+
+        # --- SEATING PLANS ---
+        THIN = Border(left=Side(style="thin"), right=Side(style="thin"), top=Side(style="thin"), bottom=Side(style="thin"))
+        THICK = Border(left=Side(style="medium"), right=Side(style="medium"), top=Side(style="medium"), bottom=Side(style="medium"))
+        FILL_BOARD = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
+        FILL_WINDOW = PatternFill(start_color="95B3D7", end_color="95B3D7", fill_type="solid")
+        FILL_DOOR = PatternFill(start_color="FABF8F", end_color="FABF8F", fill_type="solid")
+        FILL_SEAT_A = PatternFill(start_color="FFFFFF", end_color="FFFFFF", fill_type="solid")
+        FILL_SEAT_B = PatternFill(start_color="F2F2F2", end_color="F2F2F2", fill_type="solid")
+
         by_date = defaultdict(list)
         for (rid, date, slot), grid in room_grids.items():
             by_date[date].append((rid, slot, grid))
 
-        # Remove existing seating sheets named "Seating Plan - "
-        for name in [n for n in wb.sheetnames if n.startswith("Seating Plan - ")]:
-            wsold = wb[name]
-            wb.remove(wsold)
+        # Remove old
+        for name in [n for n in wb.sheetnames if n.startswith("Seating - ")]:
+            wb.remove(wb[name])
 
         for date, items in sorted(by_date.items()):
-            sheet_name = f"Seating Plan - {date}"
+            sheet_name = f"Seating - {date}"
             ws = wb.create_sheet(sheet_name)
             ws.sheet_view.showGridLines = False
-            row_cursor = 1
+            row_cursor = 2
             SEAT_COLS = 8
             SEAT_ROWS = 6
 
             for rid, slot, grid in items:
-                # header row: Room label + BOARD merged
-                ws.cell(row=row_cursor, column=2, value="Room").border = thin
-                cell_room = ws.cell(row=row_cursor, column=3, value=rid)
-                cell_room.alignment = Alignment(horizontal="center", vertical="center")
-                cell_room.border = thin
-                row_cursor += 1
+                # Header
+                ws.cell(row=row_cursor, column=2, value="ROOM").font = Font(bold=True, size=8)
+                room_cell = ws.cell(row=row_cursor, column=3, value=rid)
+                room_cell.font = Font(bold=True, size=14)
+                room_cell.alignment = Alignment(horizontal="center", vertical="center")
+                room_cell.border = THICK
+                ws.cell(row=row_cursor, column=SEAT_COLS, value="Date:").alignment = Alignment(horizontal="right")
+                ws.cell(row=row_cursor, column=SEAT_COLS+1, value=date).font = Font(bold=True)
+                ws.cell(row=row_cursor+1, column=SEAT_COLS, value="Time:").alignment = Alignment(horizontal="right")
+                ws.cell(row=row_cursor+1, column=SEAT_COLS+1, value=slot).font = Font(bold=True)
+                row_cursor += 2
 
+                # Board
                 ws.merge_cells(start_row=row_cursor, start_column=2, end_row=row_cursor, end_column=SEAT_COLS+1)
-                b = ws.cell(row=row_cursor, column=2, value="BOARD")
+                b = ws.cell(row=row_cursor, column=2, value="INSTRUCTOR / BOARD AREA")
                 b.alignment = Alignment(horizontal="center", vertical="center")
-                b.font = Font(bold=True, size=14)
-                b.border = thick
-                row_cursor += 1
+                b.font = Font(bold=True, size=12, color="FFFFFF")
+                b.fill = FILL_BOARD
+                b.border = THICK
+                row_cursor += 2
 
-                ws.cell(row=row_cursor, column=SEAT_COLS+3, value="Date").border = thin
-                ws.cell(row=row_cursor, column=SEAT_COLS+4, value=date).border = thin
-                row_cursor += 1
-                ws.cell(row=row_cursor, column=SEAT_COLS+3, value="Session").border = thin
-                ws.cell(row=row_cursor, column=SEAT_COLS+4, value=slot).border = thin
-                row_cursor += 1
-
-                start_table_row = row_cursor
-
-                # WINDOW sidebar (merge)
-                ws.merge_cells(start_row=row_cursor, start_column=1, end_row=row_cursor + SEAT_ROWS - 1, end_column=1)
-                w = ws.cell(row=row_cursor, column=1, value="WINDOW")
+                # Window
+                ws.merge_cells(start_row=row_cursor, start_column=1, end_row=row_cursor + SEAT_ROWS, end_column=1)
+                w = ws.cell(row=row_cursor, column=1, value="WINDOW SIDE")
                 w.alignment = Alignment(text_rotation=90, horizontal="center", vertical="center")
-                w.border = thick
+                w.font = Font(bold=True, color="FFFFFF")
+                w.fill = FILL_WINDOW
+                w.border = THIN
 
-                # DOOR sidebar (after SEAT_COLS + 1 i.e. col 10)
-                ws.merge_cells(start_row=row_cursor, start_column=SEAT_COLS+2, end_row=row_cursor + SEAT_ROWS - 1, end_column=SEAT_COLS+2)
-                d = ws.cell(row=row_cursor, column=SEAT_COLS+2, value="DOOR")
+                # Door
+                ws.merge_cells(start_row=row_cursor, start_column=SEAT_COLS+2, end_row=row_cursor + SEAT_ROWS, end_column=SEAT_COLS+2)
+                d = ws.cell(row=row_cursor, column=SEAT_COLS+2, value="DOOR SIDE")
                 d.alignment = Alignment(text_rotation=90, horizontal="center", vertical="center")
-                d.border = thick
+                d.font = Font(bold=True)
+                d.fill = FILL_DOOR
+                d.border = THIN
 
-                # headers C1..C8 (cols 2..9)
-                headers = [f"C{i+1}" for i in range(SEAT_COLS)]
-                for i, h in enumerate(headers):
-                    cell = ws.cell(row=row_cursor, column=2+i, value=h)
-                    cell.font = Font(bold=True)
-                    cell.alignment = Alignment(horizontal="center", vertical="center")
-                    cell.fill = gray
-                    cell.border = thin
+                # Cols
+                for i in range(SEAT_COLS):
+                    cell = ws.cell(row=row_cursor, column=2+i, value=f"C{i+1}")
+                    cell.font = Font(bold=True, color="555555")
+                    cell.alignment = Alignment(horizontal="center")
+                    cell.border = Border(bottom=Side(style="thick", color="000000"))
                 row_cursor += 1
 
-                # seat rows (6 rows)
+                # Grid
                 for r0 in range(SEAT_ROWS):
-                    ws.cell(row=row_cursor, column=1).border = thick
-                    ws.cell(row=row_cursor, column=SEAT_COLS+2).border = thick
                     for c0 in range(SEAT_COLS):
                         val = grid[r0][c0] if r0 < len(grid) and c0 < len(grid[r0]) else ""
                         cell = ws.cell(row=row_cursor, column=2+c0, value=val)
                         cell.alignment = Alignment(horizontal="center", vertical="center")
-                        cell.border = thin
-                        cell.fill = pale_blue if (r0 % 2 == 0) else pale_pink
+                        cell.border = THIN
+                        cell.fill = FILL_SEAT_B if (r0 + c0) % 2 == 0 else FILL_SEAT_A
+                        if val:
+                             cell.font = Font(bold=True, color="000000")
                     row_cursor += 1
+                
+                for c in range(2, SEAT_COLS+2):
+                    ws.cell(row=row_cursor-1, column=c).border = Border(bottom=Side(style="medium"), left=Side(style="thin"), right=Side(style="thin"))
+                row_cursor += 3
 
-                end_table_row = row_cursor - 1
-
-                # outer frame (cols 2..9)
-                for rr in range(start_table_row, end_table_row + 1):
-                    ws.cell(row=rr, column=2).border = Border(left=Side(style="medium"))
-                    ws.cell(row=rr, column=SEAT_COLS+1).border = Border(right=Side(style="medium"))
-                for cc in range(2, SEAT_COLS+2):
-                    ws.cell(row=start_table_row, column=cc).border = thick
-                    ws.cell(row=end_table_row, column=cc).border = thick
-
-                row_cursor += 2
-
-        # format Invigilators sheet if exists
-        if "Invigilators" in wb.sheetnames:
-            ws_inv = wb["Invigilators"]
-            for row in ws_inv.iter_rows():
-                for c in row:
-                    c.alignment = Alignment(horizontal="center", vertical="center")
-                    c.border = thin
-
-        # adjust column widths (skip merged cells)
+        # --- AUTO WIDTH FIX ---
         for ws in wb.worksheets:
-            for col_cells in ws.columns:
-                real_cell = None
-                for c in col_cells:
-                    if not isinstance(c, MergedCell):
-                        real_cell = c
-                        break
-                if real_cell is None:
-                    continue
-                col_letter = real_cell.column_letter
-                max_len = 0
-                for cell in col_cells:
-                    try:
-                        if cell.value:
-                            max_len = max(max_len, len(str(cell.value)))
-                    except:
+            for col in ws.columns:
+                # Safe retrieval of column letter using the first cell's column index
+                col_idx = col[0].column
+                col_letter = get_column_letter(col_idx)
+                
+                max_length = 0
+                for cell in col:
+                    try: 
+                        # Avoid error if cell value is None or if checking merged cells oddly
+                        if cell.value and len(str(cell.value)) > max_length:
+                            max_length = len(str(cell.value))
+                    except: 
                         pass
-                ws.column_dimensions[col_letter].width = min(max_len + 4, 60)
+                
+                adjusted_width = (max_length + 3)
+                if adjusted_width > 55: adjusted_width = 55
+                ws.column_dimensions[col_letter].width = adjusted_width
 
         wb.save(out)
         print(f"Exported -> {out}")
-
 
 def run_example():
     departments = {
@@ -606,12 +679,12 @@ def run_example():
     rooms = "data/rooms.csv"
     faculty = "data/faculty.csv"
     students = "data/students.csv"
-    if not os.path.exists(rooms):
-        raise FileNotFoundError("rooms.csv not found")
-    if not os.path.exists(faculty):
-        raise FileNotFoundError("faculty.csv not found")
-    if not os.path.exists(students):
-        raise FileNotFoundError("students.csv not found")
+    
+    # Validation
+    if not os.path.exists(rooms): raise FileNotFoundError("rooms.csv not found")
+    if not os.path.exists(faculty): raise FileNotFoundError("faculty.csv not found")
+    if not os.path.exists(students): raise FileNotFoundError("students.csv not found")
+    
     s = ExamScheduler(rooms, departments, faculty, students)
     s.generate()
     s.export("final_exam_schedule_with_seating.xlsx")
