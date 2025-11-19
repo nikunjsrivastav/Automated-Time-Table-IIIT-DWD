@@ -9,7 +9,7 @@ from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
 random.seed(42)
 
 days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
-excluded = ["07:30-09:00", "10:30-10:45", "13:15-14:00", "15:30-15:40"]
+excluded = ["07:30-09:00", "10:30-10:45", "13:15-14:00"]
 
 colors = [
     "FFB3BA","BAE1FF","BAFFC9","FFFFBA","FFD8BA","E3BAFF","D0BAFF","FFCBA4",
