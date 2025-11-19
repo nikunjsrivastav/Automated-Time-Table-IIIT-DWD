@@ -197,7 +197,6 @@ class ExamScheduler:
 
     def generate(self):
         pool = self._plan_electives_by_semester()
-
         def extract_number(s):
             import re
             m = re.search(r"(\d+)", str(s))
