@@ -73,6 +73,12 @@ def load_all_course_info():
                 key = basket if basket and basket != "0" else c_up
                 elective_by_basket.setdefault(key, []).append(c_up)
     return fac_map, p_map, elective_by_basket
+def add_section(cell_value, section):
+    cell_value = str(cell_value)
+    # prevent duplicate labels
+    if "(" in cell_value and cell_value.endswith(")"):
+        return cell_value
+    return f"{cell_value} ({section})"
 
 course_faculty, course_P, elective_baskets = load_all_course_info()
 
@@ -140,17 +146,25 @@ for sheet in wb_in.sheetnames:
             code = extract_code(cell)
             if code == "": continue
             P = course_P.get(code, 0.0)
+            # If this slot is already part of a multi-slot merged entry, do NOT expand it again
+            if idx > 0 and cleaned[d][slot_keys[idx-1]] == cell:
+                continue
+
+            # PATCHED LAB EXPANSION (only fills empty slots, avoids infinite spreading)
             if P >= 2.0 or "LAB" in str(cell).upper():
                 total = 0.0
                 k = idx
-                while k < len(slot_keys) and total + 1e-9 < 2.0:
+                while k < len(slot_keys) and total < 2.0:
                     target = slot_keys[k]
-                    if cleaned[d][target] in ["", cell]:
+
+        # Only allow expansion if the slot is EMPTY
+                    if cleaned[d][target] == "":
                         cleaned[d][target] = cell
                         total += slot_dur[target]
                         k += 1
                     else:
                         break
+
     for d in days:
         for sk in slot_keys:
             cell = cleaned[d][sk]
@@ -158,25 +172,33 @@ for sheet in wb_in.sheetnames:
             code = extract_code(cell)
             if code.startswith("ELECTIVE"):
                 m = re.search(r"ELECTIVE\s*([0-9]+)", code)
+
+    # always add section name
+                val_with_section = add_section(cell, sheet)
+
                 if m:
                     b = m.group(1)
                     reps = elective_baskets.get(b, [])
                     for c_up in reps:
                         facs = course_faculty.get(c_up, [])
                         for fac in facs:
-                            if fac == "": continue
+                            if fac == "":
+                                continue
                             faculty_slots.setdefault(fac, {dd: {s: "" for s in slot_keys} for dd in days})
-                            faculty_slots[fac][d][sk] = cell
+                            faculty_slots[fac][d][sk] = val_with_section
                     continue
-                else:
-                    for key, reps in elective_baskets.items():
-                        for c_up in reps:
-                            facs = course_faculty.get(c_up, [])
-                            for fac in facs:
-                                if fac == "": continue
-                                faculty_slots.setdefault(fac, {dd: {s: "" for s in slot_keys} for dd in days})
-                                faculty_slots[fac][d][sk] = cell
-                    continue
+
+    # fallback block (your else part)
+                for key, reps in elective_baskets.items():
+                    for c_up in reps:
+                        facs = course_faculty.get(c_up, [])
+                        for fac in facs:
+                            if fac == "":
+                                continue
+                            faculty_slots.setdefault(fac, {dd: {s: "" for s in slot_keys} for dd in days})
+                            faculty_slots[fac][d][sk] = val_with_section
+                continue
+
             facs = course_faculty.get(code, [])
             if facs:
                 for fac in facs:
