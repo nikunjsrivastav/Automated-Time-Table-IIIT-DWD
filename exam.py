@@ -88,7 +88,7 @@ class ExamScheduler:
             is_hall = ("hall" in t) or rid.upper() in {"C002", "C003", "C004"}
             if is_lab or is_library:
                 continue
-            usable = math.ceil(cap / 2)
+            usable = cap
             rooms.append({"Room_ID": rid, "Type": t, "Capacity": cap, "Usable": usable, "IsHall": bool(is_hall)})
         rooms.sort(key=lambda x: (x["Usable"], x["Room_ID"]))
         return rooms
