@@ -87,17 +87,25 @@ def ltp(sv):
 
 pat = re.compile(r"^[A-Z]{1,5}\d{0,3}([+/\\-][A-Z]{1,5}\d{0,3})*$", re.I)
 def valid(c):
-    codes, err = [], []
+    codes_all, codes_core, err = [], [], []
     for x in c:
         code = s(x.get("Course_Code", ""))
-        if not code: continue
-        if code.upper() in {"NEW", "ELECTIVE"}:
-            codes.append(code.upper()); continue
+        if not code:
+            continue
+        upper = code.upper()
+        if upper in {"NEW", "ELECTIVE"}:
+            codes_all.append(upper)
+            continue
         if not pat.match(code):
             err.append(code)
-        codes.append(code.upper())
-    dup = {x for x in codes if codes.count(x) > 1 and x not in {"NEW", "ELECTIVE"}}
-    if dup: err += list(dup)
+        codes_all.append(upper)
+        elec_flag = s(x.get("Elective", "")) == "1"
+        if not elec_flag:
+            codes_core.append(upper)
+
+    dup_core = {x for x in codes_core if codes_core.count(x) > 1}
+    if dup_core:
+        err += list(dup_core)
     return err
 def is_combined_course(code, rm):
     return (code, "L") in rm and rm[(code, "L")] == "C004"
@@ -593,7 +601,7 @@ def add_csv_legend_block(ws, csv_path, legend_title, room_prefix=None, elective_
                 
                 elective_room_map[sync_name] = chosen
 
-            elective_rooms.append(f"{chosen} (random)")
+            elective_rooms.append(f"{chosen}")
         else:
             elective_rooms.append("")
 
@@ -862,10 +870,10 @@ if __name__ == "__main__":
     combined_ece5_courses = (ece5_block1 or []) + (ece5_block2 or [])
     merge_and_color(ws10, combined_ece5_courses)
     # --- DSAI 7th Sem ---
-    ws6 = wb.create_sheet("DSAI 7TH-SEM Timetable")
+    ws6 = wb.create_sheet("7TH-SEM Timetable")
     s7f, s7s = split(coursesVII)
-    s7_block1 = generate(s7f, ws6, "DSAI 7TH-SEM First Half", seed+14, sync_sem7, room_prefix='C3', elective_room_map=elective_room_map, room_busy_global=global_room_busy)
-    s7_block2 = generate(s7s, ws6, "DSAI 7TH-SEM Second Half", seed+15, sync_sem7, room_prefix='C3', elective_room_map=elective_room_map, room_busy_global=global_room_busy)
+    s7_block1 = generate(s7f, ws6, "7TH-SEM First Half", seed+14, sync_sem7, room_prefix='C3', elective_room_map=elective_room_map, room_busy_global=global_room_busy)
+    s7_block2 = generate(s7s, ws6, "7TH-SEM Second Half", seed+15, sync_sem7, room_prefix='C3', elective_room_map=elective_room_map, room_busy_global=global_room_busy)
     add_csv_legend_block(ws6, "data/courses7.csv", "7TH SEM", room_prefix="C3", elective_room_map=elective_room_map)
     combined_7_courses = (s7_block1 or []) + (s7_block2 or [])
     merge_and_color(ws6, combined_7_courses)
