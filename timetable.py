@@ -174,10 +174,7 @@ def alloc_specific(tt, busy, rm, room_busy, day, slots_to_use, f, code, typ, ele
         course_usage[day][code] = {"L":0,"T":0,"P":0}
 
     usage = course_usage[day][code]
-
-# For electives: Do NOT treat P as a real lab hour
     if typ == "P" and elec:
-    # Elective lab behaves like theory: allow unlimited placement
         pass
     else:
         if typ == "P":
@@ -436,7 +433,6 @@ def assign_combined_precise_durations(tt, busy, rm, room_busy, labsd, course_usa
                 ch.append((1.0, "P")); rem -= 1.0
         chunks_map[code] = sorted(ch, key=lambda x: -x[0])
         combined_list.append((code, c))
-
     valid_slots = get_all_valid_free_slots(tt)
     valid_blocks = extract_contiguous_blocks(valid_slots)
     excluded_slots = get_all_excluded_free_slots(tt)
@@ -577,7 +573,6 @@ def add_csv_legend_block(ws, csv_path, legend_title, room_prefix=None, elective_
 
     master_pool = sorted(list(set(all_classrooms)))
     random.shuffle(master_pool)
-    # ------------------------------------------------------
 
     elective_rooms = []
     for _, row in df.iterrows():
